@@ -1,7 +1,5 @@
 # TypeScript Rules
 
-> Linter-enforced rules are omitted here when oxlint catches them. These are judgment calls only.
-
 - Avoid explicit type annotations unless they materially improve readability. Prefer inference.
 - If the type is genuinely unknown, prefer `unknown`.
 - Avoid type casting. Only cast when strictly necessary to make something work, not as a convenience.

@@ -1,6 +1,6 @@
 # React Rules
 
-> Only applies in React projects. Linter-enforced rules are omitted when oxlint and React Compiler linting catch them.
+> Only applies in React projects.
 
 ## React Compiler
 

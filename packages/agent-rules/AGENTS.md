@@ -3,7 +3,6 @@
 Before editing code, read and follow these rule files:
 
 - `rules/general.md`
-- `rules/tooling.md`
 - `rules/typescript.md`
 - `rules/react.md` when working in React projects
 - `rules/convex.md` when working in Convex projects
