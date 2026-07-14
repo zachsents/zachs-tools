@@ -5,12 +5,14 @@
   "license": "MIT",
   "files": [
     "AGENTS.md",
-    "README.md"
+    "README.md",
+    "rules"
   ],
   "publishConfig": {
     "access": "public"
   },
   "exports": {
-    "./AGENTS.md": "./AGENTS.md"
+    "./AGENTS.md": "./AGENTS.md",
+    "./rules/*": "./rules/*"
   }
 }
