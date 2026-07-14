@@ -1,0 +1,4 @@
+interface:
+  display_name: "Zach Coding Standards"
+  short_description: "Apply Zach’s coding and tooling conventions"
+  default_prompt: "Use $follow-zach-coding-standards while implementing this change."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Install Zach Agent Rules"
+  short_description: "Install or refresh Zach’s repository guidance"
+  default_prompt: "Use $install-zach-agent-rules to install Zach’s standards in this repository."

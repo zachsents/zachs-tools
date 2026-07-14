@@ -1,0 +1,29 @@
+{
+  "name": "zach-codex",
+  "version": "0.1.0",
+  "description": "Zach's reusable coding standards and preferred MCP integrations for Codex.",
+  "author": {
+    "name": "Zach Sents",
+    "email": "zachsents@gmail.com",
+    "url": "https://github.com/zachsents"
+  },
+  "homepage": "https://github.com/zachsents/zachs-tools",
+  "repository": "https://github.com/zachsents/zachs-tools",
+  "license": "MIT",
+  "keywords": ["coding-standards", "agent-rules", "mcp", "typescript"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Zach Codex",
+    "shortDescription": "Coding standards and preferred developer tools",
+    "longDescription": "Apply Zach's reusable Bun, TypeScript, React, Convex, validation, and MCP workflow preferences across repositories.",
+    "developerName": "Zach Sents",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/zachsents/zachs-tools",
+    "defaultPrompt": [
+      "Apply my coding standards to this change.",
+      "Install my agent rules in this repository."
+    ]
+  }
+}
