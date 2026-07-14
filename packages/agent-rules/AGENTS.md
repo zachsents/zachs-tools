@@ -1,0 +1,55 @@
+# Agent Rules
+
+- Prefer the exact source of truth for the task: current repo files, logs, API responses, database rows, docs, generated types, or the named config.
+- Keep scope tight. Do not refactor adjacent code, edit unrelated files, or clean up nearby work unless the user asks.
+- Use Bun for package management, script execution, and dependency installation.
+- When using a library, framework, SDK, CLI, or cloud service, check the current official docs before relying on memory.
+- If a project has oxlint config, run `oxlint --rules` before writing code and avoid code that violates the active rules.
+- After code edits, run the project check command when it exists. Prefer `bun run check`; otherwise run the smallest relevant typecheck, lint, and test commands.
+- If the project uses Convex, run `bunx convex dev --once` after editing Convex functions or schema.
+- Do not perform Git writes unless explicitly instructed. If asked to commit, keep the commit message short and scoped.
+- Use `function` declarations for top-level and exported functions. Use arrow functions for inline callbacks and closures.
+- Prefer `const` unless mutation is intentional and required.
+- Inline values used once unless naming the value improves readability.
+- Do not hoist magic values into constants unless they are reused or semantically meaningful.
+- Avoid deep nesting. Extract small, pure helpers when that makes the code easier to read.
+- Re-evaluate variables left behind by iterative edits and simplify aggressively.
+- Prefer declarative, expression-based construction for objects and arrays. Avoid declare-then-mutate shapes that force weak annotations.
+- Use conditional spreads and ternaries for conditional object properties when that keeps inference precise and the expression readable.
+- Prefer `Array.filter`, `.map`, `.flatMap`, and similar operations over imperative loops with `push`.
+- When vanilla JavaScript lacks the right utility, prefer Remeda in projects that already use it.
+- Prefer Remeda `pipe` over chained native array methods when it fits the surrounding code.
+- Use `Promise.all` when independent async work can run concurrently.
+- Use `try/catch` sparingly. Only catch errors when there is meaningful recovery or transformation work to do.
+- Comment only when intent is not obvious from naming and structure.
+- Document quirks developers need to know, but do not narrate obvious behavior.
+- If you intentionally break a project rule, leave a `REVIEW:` comment explaining why.
+- Add dependencies with `bun add`, and run `bun install` after adding workspace dependencies.
+- Prefer official CLIs and generators over manually creating generated config.
+- Avoid unnecessary spreads. Confirm the spread is needed to create a new reference or preserve fields.
+- Avoid manually re-listing every property of an object. Prefer object spread, `pick`, or `omit` where appropriate.
+- Avoid unnecessary defaults, optional chaining, nullish coalescing, or conditions when the type already proves the value exists.
+- Use the simplest correct conditional. Prefer truthy checks when the distinction is not important.
+- For nullish checks, prefer `value != null` unless the distinction between `null` and `undefined` matters.
+- Do not silence TypeScript or lint failures with directive comments unless the user explicitly approves.
+- Avoid casts. Cast only when strictly necessary and after verifying the produced types.
+- Never use `as unknown as`.
+- If a value is genuinely unknown, keep it as `unknown` until it is narrowed or validated.
+- Never manually redefine types that can be imported or derived from source definitions.
+- Use Zod for values from untrusted or unknown sources, and infer types from the schema.
+- Do not create `.d.ts` module declarations as a shortcut around missing types.
+- Design types to be specific as early in the type graph as practical.
+- In React projects, assume React Compiler is enabled unless the project says otherwise.
+- Avoid `useCallback`, `useMemo`, and `React.memo` unless wrapping a third-party library that breaks without manual memoization.
+- In React 19 projects, use `ref` as a regular prop instead of `forwardRef`.
+- Prefer ref callback cleanup for per-element observers.
+- When an effect subscribes to events, use `useEffectEvent` for handler logic and keep the effect focused on subscription cleanup.
+- Prefer `use()` for reading promises and context in render when the project supports it.
+- Use error boundaries to isolate failures in distinct UI sections.
+- Keep React components small and move non-UI logic into hooks.
+- Avoid `useEffect` when an event-driven design is clearer.
+- Follow the Rules of React strictly.
+- In Convex projects, never edit `convex/_generated/`.
+- In Convex projects, use `convex-helpers` when available for common patterns.
+- In Convex React projects, prefer `@convex-dev/react-query` to direct Convex hooks when the project uses TanStack Query.
+- In Convex projects, prefer Convex scheduling over external cron or queue systems unless the project has a different established pattern.

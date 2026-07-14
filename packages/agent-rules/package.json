@@ -1,0 +1,16 @@
+{
+  "name": "@zachsents/agent-rules",
+  "version": "0.1.0",
+  "description": "Reusable AGENTS.md guidance for Zach's projects.",
+  "license": "MIT",
+  "files": [
+    "AGENTS.md",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./AGENTS.md": "./AGENTS.md"
+  }
+}

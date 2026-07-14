@@ -1,0 +1,104 @@
+{
+  "name": "eslint-plugin-zachs-rules",
+  "version": "0.1.1",
+  "description": "A small set of custom ESLint rules.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zachsents/zachs-tools.git",
+    "directory": "packages/eslint-plugin-zachs-rules"
+  },
+  "bugs": {
+    "url": "https://github.com/zachsents/zachs-tools/issues"
+  },
+  "homepage": "https://github.com/zachsents/zachs-tools/tree/main/packages/eslint-plugin-zachs-rules#readme",
+  "keywords": [
+    "eslint",
+    "eslint-plugin",
+    "oxlint",
+    "typescript-eslint",
+    "type-aware",
+    "object-spread",
+    "pick",
+    "single-use"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts",
+      "./oxlint": "./src/oxlint.ts",
+      "./oxlint/recommended": "./src/configs/oxlint-recommended.ts",
+      "./rules/*": "./src/rules/*"
+    },
+    "cjs": false,
+    "conditions": {
+      "bun": "src"
+    }
+  },
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./oxlint": {
+      "bun": "./src/oxlint.ts",
+      "types": "./dist/oxlint.d.ts",
+      "default": "./dist/oxlint.js"
+    },
+    "./oxlint/recommended": {
+      "bun": "./src/configs/oxlint-recommended.ts",
+      "types": "./dist/configs/oxlint-recommended.d.ts",
+      "default": "./dist/configs/oxlint-recommended.js"
+    },
+    "./rules/*": {
+      "bun": "./src/rules/*",
+      "types": "./dist/rules/*",
+      "default": "./dist/rules/*"
+    }
+  },
+  "scripts": {
+    "typecheck": "command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix --fix-suggestions",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "bun test",
+    "build": "zshy",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build",
+    "prepublishOnly": "bun run check"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "typescript": ">=5.0.0"
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.74.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "@typescript-eslint/utils": "^8.62.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.4",
+    "oxlint": "^1.74.0",
+    "oxlint-tsgolint": "^0.24.0",
+    "prettier": "3.4.2",
+    "prettier-plugin-jsdoc": "^1.8.0",
+    "typescript": "^5.9.3",
+    "zshy": "^0.7.2"
+  }
+}

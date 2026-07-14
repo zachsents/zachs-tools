@@ -1,0 +1,55 @@
+{
+  "name": "@zachsents/ts-mcp",
+  "version": "0.3.3",
+  "description": "Give AI agents TypeScript type awareness",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "ts-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "mcp",
+    "typescript",
+    "tsgo",
+    "type-inference",
+    "lsp",
+    "ai",
+    "agent"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools.git",
+    "directory": "packages/ts-mcp"
+  },
+  "author": "Zach Sents",
+  "license": "MIT",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "build": "tsc -p tsconfig.build.json && shx chmod +x dist/index.js",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix --fix-suggestions",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fix": "bun run lint:fix && bun run format",
+    "test": "bun test/smoke.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
+    "prepublishOnly": "bun run check && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxlint": "^1.74.0",
+    "oxlint-tsgolint": "^0.24.0",
+    "prettier": "3.4.2",
+    "prettier-plugin-jsdoc": "^1.8.0",
+    "shx": "^0.4.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "^4.3.6"
+  }
+}
