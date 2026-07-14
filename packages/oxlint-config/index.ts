@@ -1,12 +1,21 @@
-export default {
+import { defineConfig } from "oxlint"
+
+export default defineConfig({
   categories: {
     correctness: "error",
     suspicious: "error",
   },
-  plugins: ["eslint", "typescript", "unicorn", "oxc"],
+  plugins: ["eslint", "typescript", "unicorn", "oxc", "jsdoc"],
+  jsPlugins: [
+    {
+      name: "jsdoc-js",
+      specifier: "eslint-plugin-jsdoc",
+    },
+  ],
   rules: {
     "eslint/no-shadow": "off",
     "eslint/no-underscore-dangle": "off",
+    "jsdoc-js/require-jsdoc": ["error", { enableFixer: false }],
     "typescript/consistent-return": "off",
     "typescript/no-explicit-any": "error",
     "typescript/no-empty-object-type": [
@@ -37,4 +46,4 @@ export default {
     "typescript/prefer-string-starts-ends-with": "error",
     "typescript/prefer-ts-expect-error": "error",
   },
-}
+})

@@ -14,6 +14,7 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://example.invalid/rules/${name}`,
 )
 
+/** Check whether mapped keys are a strict subset of source properties. */
 function isStrictSubset(
   mappedKeys: Set<string>,
   sourceProperties: Set<string>,

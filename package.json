@@ -7,8 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "bun run --cwd packages/ts-mcp build && bun run --cwd packages/eslint-plugin-zachs-rules build",
-    "check": "bun run format:check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
+    "agent-rules:sync": "bun plugins/zach-codex/scripts/sync-agent-rules.ts",
+    "build": "bun run --cwd packages/oxlint-config build && bun run --cwd packages/ts-mcp build && bun run --cwd packages/eslint-plugin-zachs-rules build",
+    "check": "bun run agent-rules:sync && bun run format:check && bun run --cwd packages/oxlint-config check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "bun run --cwd packages/ts-mcp lint && bun run --cwd packages/eslint-plugin-zachs-rules lint",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "eslint-plugin-jsdoc": "^63.0.13",
     "oxlint": "^1.74.0",
     "oxlint-tsgolint": "^0.24.0",
     "prettier": "3.4.2",

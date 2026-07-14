@@ -1,31 +1,33 @@
 {
   "name": "@zachsents/oxlint-config",
   "version": "0.1.0",
-  "description": "Zach's shared oxlint configuration.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/zachsents/zachs-tools",
-    "directory": "packages/oxlint-config"
-  },
-  "license": "MIT",
-  "type": "module",
-  "main": "index.js",
-  "exports": {
-    ".": "./index.js",
-    "./react": "./react.js"
-  },
-  "files": [
-    "index.js",
-    "react.js"
-  ],
-  "publishConfig": {
-    "access": "public"
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "zshy": "^0.7.3"
   },
   "peerDependencies": {
     "@tanstack/eslint-plugin-router": ">=1",
+    "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-react-hooks": ">=6",
     "oxlint": ">=1.74.0"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
+    }
+  },
+  "description": "Zach's shared oxlint configuration.",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
   "peerDependenciesMeta": {
     "@tanstack/eslint-plugin-router": {
       "optional": true
@@ -33,5 +35,23 @@
     "eslint-plugin-react-hooks": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit",
+    "build": "zshy",
+    "check": "bun run typecheck && bun run build",
+    "prepublishOnly": "bun run check"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "zshy": {
+    "exports": {
+      ".": "./index.ts",
+      "./react": "./react.ts"
+    },
+    "cjs": false
   }
 }

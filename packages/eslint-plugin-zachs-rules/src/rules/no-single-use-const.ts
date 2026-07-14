@@ -15,6 +15,7 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/zachsents/eslint-plugin-zachs-rules#${name}`,
 )
 
+/** Check whether a variable declaration is exported. */
 function isExported(
   node: TSESLint.Scope.Definitions.VariableDefinition["parent"],
 ) {
@@ -24,6 +25,7 @@ function isExported(
   )
 }
 
+/** Check whether a variable is an eligible const declaration. */
 function isSimpleConstDefinition(
   variable: TSESLint.Scope.Variable,
   ignoreExports: boolean,
@@ -45,12 +47,14 @@ function isSimpleConstDefinition(
   return true
 }
 
+/** Check whether a variable is reassigned after initialization. */
 function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
   return variable.references.some(
     (reference) => reference.isWrite() && reference.init !== true,
   )
 }
 
+/** Check whether a name uses constant-case syntax. */
 function isConstantCase(name: string) {
   return /^[A-Z][A-Z0-9_]*$/u.test(name)
 }
@@ -103,6 +107,7 @@ export default createRule<Options, MessageIds>({
     const ignoreExports = options?.ignoreExports ?? true
     const maxUses = options?.maxUses ?? 1
 
+    /** Report eligible single-use constants in a scope and its children. */
     function checkScope(scope: TSESLint.Scope.Scope) {
       for (const variable of scope.variables) {
         if (

@@ -273,6 +273,7 @@ function formatSymbolTree(
   }
 }
 
+/** Format an LSP text edit for CLI output. */
 function formatTextEdit(edit: LspCodeAction["edits"][number]): string {
   const loc = `    ${edit.file}:${edit.startLine}:${edit.startCharacter}`
   if (edit.newText === "") {
@@ -319,6 +320,7 @@ async function applyEdits(filePath: string, edits: LspTextEdit[]) {
   await writeFile(filePath, lines.join("\n"))
 }
 
+/** Shut down the client pool before exiting. */
 async function cleanup() {
   await pool.shutdown()
   process.exit(0)

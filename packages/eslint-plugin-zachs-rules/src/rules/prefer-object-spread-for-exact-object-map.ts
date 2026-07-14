@@ -14,6 +14,7 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://example.invalid/rules/${name}`,
 )
 
+/** Check whether mapped keys exactly match the source properties. */
 function hasExactPropertySet(
   mappedKeys: Set<string>,
   sourceProperties: Set<string>,

@@ -15,6 +15,7 @@ type GroupState = SourceMappingGroup & {
   hasExistingSpread: boolean
 }
 
+/** Read a static property name from an object property key. */
 function getStaticPropertyName(key: TSESTree.Property["key"]): string | null {
   if (key.type === AST_NODE_TYPES.Identifier) {
     return key.name
@@ -27,6 +28,7 @@ function getStaticPropertyName(key: TSESTree.Property["key"]): string | null {
   return null
 }
 
+/** Read the property name from a non-computed member expression. */
 function getIdentifierMemberName(
   member: TSESTree.MemberExpression,
 ): string | null {
@@ -37,6 +39,7 @@ function getIdentifierMemberName(
   return member.property.name
 }
 
+/** Return an expression when it is a direct identifier reference. */
 function getSourceIdentifier(
   expression: TSESTree.Expression,
 ): TSESTree.Identifier | null {
@@ -47,6 +50,7 @@ function getSourceIdentifier(
   return null
 }
 
+/** Match a property that maps a source member under the same name. */
 function isSameNamedIdentifierMemberMapping(
   property: TSESTree.Property,
 ): { source: TSESTree.Identifier; keyName: string } | null {
@@ -70,6 +74,7 @@ function isSameNamedIdentifierMemberMapping(
   return { source, keyName }
 }
 
+/** Return the identifier used by a spread element. */
 function getSpreadIdentifier(
   property: TSESTree.SpreadElement,
 ): TSESTree.Identifier | null {
@@ -78,6 +83,7 @@ function getSpreadIdentifier(
     : null
 }
 
+/** Group same-named source property mappings that could use a helper. */
 export function findSameNamedSourceMappings(
   objectExpression: TSESTree.ObjectExpression,
   minProperties: number,

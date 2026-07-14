@@ -1,6 +1,8 @@
-import baseConfig from "./index.js"
+import { defineConfig } from "oxlint"
 
-export default {
+import baseConfig from "./index.ts"
+
+export default defineConfig({
   extends: [baseConfig],
   plugins: ["eslint", "typescript", "unicorn", "oxc", "react"],
   jsPlugins: [
@@ -44,4 +46,4 @@ export default {
     "@tanstack/router/create-route-property-order": "warn",
     "@tanstack/router/route-param-names": "error",
   },
-}
+})

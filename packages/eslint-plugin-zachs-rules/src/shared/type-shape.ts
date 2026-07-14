@@ -12,6 +12,7 @@ export type SourceShape =
       kind: "unknown"
     }
 
+/** Check whether a type cannot provide a stable property shape. */
 function isUnknownLikeType(type: ts.Type): boolean {
   return Boolean(
     type.flags &
@@ -22,6 +23,7 @@ function isUnknownLikeType(type: ts.Type): boolean {
   )
 }
 
+/** Check whether a type accepts arbitrary string or number keys. */
 function hasIndexSignature(type: ts.Type, checker: ts.TypeChecker): boolean {
   const apparent = checker.getApparentType(type)
   return (
@@ -30,11 +32,13 @@ function hasIndexSignature(type: ts.Type, checker: ts.TypeChecker): boolean {
   )
 }
 
+/** Return a user-facing property name for a TypeScript symbol. */
 function getStringPropertyName(symbol: ts.Symbol): string | null {
   const name = symbol.getName()
   return name.startsWith("__@") ? null : name
 }
 
+/** Resolve the statically known property shape for an ESTree node. */
 export function getSourceShape(
   services: ParserServicesWithTypeInformation,
   node: TSESTree.Node,

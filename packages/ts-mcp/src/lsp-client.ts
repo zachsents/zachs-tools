@@ -614,10 +614,12 @@ export class LspClient {
   }
 }
 
+/** Convert a file path to an LSP file URI. */
 function pathToUri(filePath: string): string {
   return `file://${filePath}`
 }
 
+/** Convert an LSP file URI to a file path. */
 function uriToPath(uri: string): string {
   return uri.replace(/^file:\/\//, "")
 }
@@ -724,6 +726,7 @@ function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
   return edits
 }
 
+/** Return the LSP language identifier for a source file. */
 function getLanguageId(filePath: string): string {
   const ext = extname(filePath)
   switch (ext) {

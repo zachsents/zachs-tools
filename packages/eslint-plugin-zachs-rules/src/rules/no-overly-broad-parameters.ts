@@ -28,6 +28,7 @@ const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/zachsents/eslint-plugin-zachs-rules#${name}`,
 )
 
+/** Check whether a declaration is exported. */
 function isExported(node: TSESTree.Node): boolean {
   return (
     node.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration ||
@@ -35,6 +36,7 @@ function isExported(node: TSESTree.Node): boolean {
   )
 }
 
+/** Check whether an observed type is useful for narrowing. */
 function isUsableObservedType(type: ts.Type): boolean {
   return !(
     type.flags &
@@ -45,6 +47,7 @@ function isUsableObservedType(type: ts.Type): boolean {
   )
 }
 
+/** Check whether a candidate type is strictly narrower than a declared type. */
 function isStrictlyNarrower(
   candidate: ts.Type,
   declared: ts.Type,
@@ -60,6 +63,7 @@ function isStrictlyNarrower(
   return !checker.isTypeAssignableTo(declared, candidate)
 }
 
+/** Find one widened type that accepts every observed argument type. */
 function findCommonObservedType(
   observedTypes: ts.Type[],
   checker: ts.TypeChecker,
@@ -79,6 +83,7 @@ function findCommonObservedType(
   )
 }
 
+/** Resolve the unique TypeScript symbol for a function name. */
 function getFunctionNameSymbol(
   checker: ts.TypeChecker,
   node: TSESTree.Identifier,
@@ -93,6 +98,7 @@ function getFunctionNameSymbol(
   return { declarationName, symbol }
 }
 
+/** Build narrowing candidates from supported function parameters. */
 function getParameters(
   checker: ts.TypeChecker,
   estreeParameters: TSESTree.Parameter[],
@@ -157,6 +163,7 @@ export default createRule<Options, MessageIds>({
     )
     const candidates: FunctionCandidate[] = []
 
+    /** Add a locally declared function to the candidate set. */
     function addCandidate(
       nameNode: TSESTree.Identifier,
       estreeParameters: TSESTree.Parameter[],
@@ -178,11 +185,13 @@ export default createRule<Options, MessageIds>({
       })
     }
 
+    /** Inspect references and collect argument types for candidate functions. */
     function inspectReferences() {
       const bySymbol = new Map(
         candidates.map((candidate) => [candidate.symbol, candidate]),
       )
 
+      /** Visit TypeScript nodes to associate calls with candidates. */
       function visit(node: ts.Node) {
         if (ts.isIdentifier(node)) {
           const resolvedSymbol = checker.getSymbolAtLocation(node)
@@ -227,6 +236,7 @@ export default createRule<Options, MessageIds>({
       for (const file of sourceFiles) visit(file)
     }
 
+    /** Report parameters that can be narrowed at every direct callsite. */
     function reportCandidates() {
       inspectReferences()
 
