@@ -2,6 +2,11 @@
   "name": "@zachsents/agent-rules",
   "version": "0.1.0",
   "description": "Reusable AGENTS.md guidance for Zach's projects.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools",
+    "directory": "packages/agent-rules"
+  },
   "license": "MIT",
   "files": [
     "AGENTS.md",

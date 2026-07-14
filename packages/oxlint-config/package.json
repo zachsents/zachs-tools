@@ -2,6 +2,11 @@
   "name": "@zachsents/oxlint-config",
   "version": "0.1.0",
   "description": "Zach's shared oxlint configuration.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools",
+    "directory": "packages/oxlint-config"
+  },
   "license": "MIT",
   "type": "module",
   "main": "index.js",

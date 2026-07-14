@@ -2,6 +2,11 @@
   "name": "@zachsents/prettier-config",
   "version": "0.1.0",
   "description": "Zach's shared Prettier configuration.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools",
+    "directory": "packages/prettier-config"
+  },
   "license": "MIT",
   "type": "module",
   "main": "index.js",
