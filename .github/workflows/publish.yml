@@ -10,6 +10,7 @@ on:
       - bun.lock
       - package.json
       - packages/*/package.json
+      - plugins/*/package.json
 
 permissions:
   contents: write
@@ -31,6 +32,7 @@ jobs:
           - packages/prettier-config
           - packages/oxlint-config
           - packages/agent-rules
+          - plugins/zach-codex
     steps:
       - name: Checkout
         uses: actions/checkout@v4

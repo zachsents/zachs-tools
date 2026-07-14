@@ -1,26 +1,9 @@
 {
   "mcpServers": {
-    "context7": {
-      "command": "bunx",
-      "args": ["@upstash/context7-mcp"]
-    },
-    "axiom": {
-      "type": "http",
-      "url": "https://mcp.axiom.co/mcp"
-    },
-    "linear": {
-      "type": "http",
-      "url": "https://mcp.linear.app/mcp",
-      "oauth_resource": "https://mcp.linear.app/mcp"
-    },
     "ts-hover": {
       "command": "bunx",
       "args": ["@zachsents/ts-mcp"],
       "cwd": "/tmp"
-    },
-    "vercel": {
-      "type": "http",
-      "url": "https://mcp.vercel.com"
     }
   }
 }
