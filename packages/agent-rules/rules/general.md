@@ -82,6 +82,8 @@ After edits, run `bun run check` when it exists. If the project does not have a 
 ## Tooling & Scaffolding
 
 - Prefer using official CLI tools or generators over manually creating or editing config files.
+- Use `@zachsents/prettier-config` instead of recreating the shared Prettier settings.
+- Extend `@zachsents/oxlint-config` for oxlint configuration. React projects should also use `@zachsents/oxlint-config/react`.
 
 ## Object & Value Handling
 
