@@ -1,5 +1,6 @@
 # TypeScript Rules
 
+- Use `ts-mcp` frequently throughout the TypeScript writing process, not only when resolving errors. Use hover and inlay hints to inspect inferred types before and during edits, references before changing shared symbols, and diagnostics after each meaningful edit.
 - Avoid explicit type annotations unless they materially improve readability. Prefer inference.
 - If the type is genuinely unknown, prefer `unknown`.
 - Avoid type casting. Only cast when strictly necessary to make something work, not as a convenience.
