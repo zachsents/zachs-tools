@@ -195,7 +195,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.release.outputs.should_publish == 'true'
-        run: npm publish "$PACKAGE_DIR" --access public --provenance
+        run: npm publish "./${PACKAGE_DIR}" --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
