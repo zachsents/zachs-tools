@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/ts-mcp",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Give AI agents TypeScript type awareness",
   "type": "module",
   "main": "dist/index.js",
