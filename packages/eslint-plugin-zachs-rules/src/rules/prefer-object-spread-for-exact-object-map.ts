@@ -1,18 +1,7 @@
 import { ESLintUtils, TSESTree } from "@typescript-eslint/utils"
+import { createRule } from "../shared/create-rule"
 import { findSameNamedSourceMappings } from "../shared/exact-property-map"
 import { getSourceShape } from "../shared/type-shape"
-
-type Options = [
-  {
-    minProperties?: number
-  }?,
-]
-
-type MessageIds = "preferSpread"
-
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://example.invalid/rules/${name}`,
-)
 
 /** Check whether mapped keys exactly match the source properties. */
 function hasExactPropertySet(
@@ -28,7 +17,7 @@ function hasExactPropertySet(
   return true
 }
 
-export default createRule<Options, MessageIds>({
+export default createRule<[{ minProperties?: number }?], "preferSpread">({
   name: "prefer-object-spread-for-exact-object-map",
   meta: {
     type: "suggestion",
@@ -55,20 +44,26 @@ export default createRule<Options, MessageIds>({
   },
   defaultOptions: [{ minProperties: 2 }],
   create(context, [options]) {
-    const services = ESLintUtils.getParserServices(context)
-    const minProperties = options?.minProperties ?? 2
-
     return {
       ObjectExpression(node: TSESTree.ObjectExpression) {
-        for (const group of findSameNamedSourceMappings(node, minProperties)) {
-          const shape = getSourceShape(services, group.sourceNode)
+        for (const group of findSameNamedSourceMappings(
+          node,
+          options?.minProperties ?? 2,
+        )) {
+          const shape = getSourceShape(
+            ESLintUtils.getParserServices(context),
+            group.sourceNode,
+          )
           if (shape.kind !== "known" || shape.hasIndexSignature) continue
 
-          const mappedKeys = new Set(
-            group.mappings.map((mapping) => mapping.keyName),
-          )
-
-          if (!hasExactPropertySet(mappedKeys, shape.propertyNames)) continue
+          if (
+            !hasExactPropertySet(
+              new Set(group.mappings.map((mapping) => mapping.keyName)),
+              shape.propertyNames,
+            )
+          ) {
+            continue
+          }
 
           const firstMapping = group.mappings.at(0)
           if (!firstMapping) continue

@@ -7,8 +7,7 @@ import type { LspCodeAction, LspSymbol, LspTextEdit } from "./lsp-client.ts"
 import { TsgoPool } from "./pool.ts"
 import { resolveTsgoBinary } from "./resolve-binary.ts"
 
-const binaryPath = resolveTsgoBinary()
-const pool = new TsgoPool(binaryPath)
+const pool = new TsgoPool(resolveTsgoBinary())
 
 const server = new McpServer({
   name: "ts-hover",
@@ -79,8 +78,9 @@ server.registerTool(
     const parts: string[] = []
 
     for (const d of diagnostics) {
-      const code = d.code != null ? ` TS${d.code}` : ""
-      parts.push(`${d.line}:${d.character} ${d.severity}${code}: ${d.message}`)
+      parts.push(
+        `${d.line}:${d.character} ${d.severity}${d.code != null ? ` TS${d.code}` : ""}: ${d.message}`,
+      )
     }
 
     const fixes = actions.filter((a) => a.kind?.startsWith("quickfix"))
@@ -137,12 +137,15 @@ server.registerTool(
       }
     }
 
-    const text = locations
-      .map((loc) => `${loc.file}:${loc.line}:${loc.character}`)
-      .join("\n")
-
     return {
-      content: [{ type: "text" as const, text }],
+      content: [
+        {
+          type: "text" as const,
+          text: locations
+            .map((loc) => `${loc.file}:${loc.line}:${loc.character}`)
+            .join("\n"),
+        },
+      ],
     }
   },
 )
@@ -248,12 +251,15 @@ server.registerTool(
       }
     }
 
-    const text = hints
-      .map((h) => `${h.line}:${h.character} ${h.kind}: ${h.text}`)
-      .join("\n")
-
     return {
-      content: [{ type: "text" as const, text }],
+      content: [
+        {
+          type: "text" as const,
+          text: hints
+            .map((h) => `${h.line}:${h.character} ${h.kind}: ${h.text}`)
+            .join("\n"),
+        },
+      ],
     }
   },
 )
@@ -264,9 +270,10 @@ function formatSymbolTree(
   lines: string[],
   depth: number,
 ): void {
-  const indent = "  ".repeat(depth)
   for (const sym of symbols) {
-    lines.push(`${indent}${sym.kind} ${sym.name} (line ${sym.line})`)
+    lines.push(
+      `${"  ".repeat(depth)}${sym.kind} ${sym.name} (line ${sym.line})`,
+    )
     if (sym.children.length > 0) {
       formatSymbolTree(sym.children, lines, depth + 1)
     }
@@ -296,24 +303,20 @@ function formatTextEdit(edit: LspCodeAction["edits"][number]): string {
  * positions aren't shifted by later replacements.
  */
 async function applyEdits(filePath: string, edits: LspTextEdit[]) {
-  const content = await readFile(filePath, "utf-8")
-  const lines = content.split("\n")
+  const lines = (await readFile(filePath, "utf-8")).split("\n")
 
-  const sorted = [...edits].toSorted((a, b) => {
+  for (const edit of [...edits].toSorted((a, b) => {
     if (a.startLine !== b.startLine) return b.startLine - a.startLine
     return b.startCharacter - a.startCharacter
-  })
-
-  for (const edit of sorted) {
-    const startLine = lines[edit.startLine] ?? ""
-    const endLine = lines[edit.endLine] ?? ""
-    const before = startLine.slice(0, edit.startCharacter)
-    const after = endLine.slice(edit.endCharacter)
-    const replacement = (before + edit.newText + after).split("\n")
+  })) {
     lines.splice(
       edit.startLine,
       edit.endLine - edit.startLine + 1,
-      ...replacement,
+      ...(
+        (lines[edit.startLine] ?? "").slice(0, edit.startCharacter) +
+        edit.newText +
+        (lines[edit.endLine] ?? "").slice(edit.endCharacter)
+      ).split("\n"),
     )
   }
 
@@ -329,5 +332,4 @@ async function cleanup() {
 process.on("SIGINT", cleanup)
 process.on("SIGTERM", cleanup)
 
-const transport = new StdioServerTransport()
-await server.connect(transport)
+await server.connect(new StdioServerTransport())

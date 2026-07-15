@@ -4,7 +4,7 @@ A small set of custom ESLint rules.
 
 ## Rules
 
-### ESLint
+### ESLint and Oxlint
 
 - `zachs-rules/no-overly-broad-parameters`
 
@@ -13,16 +13,22 @@ A small set of custom ESLint rules.
   - Skips helpers that escape through a non-call reference, omitted or spread
     arguments, overloads, incompatible callsite types, and exported functions.
 
-- `zachs-rules/no-single-use-const`
+- `zachs-rules/prefer-inline-module-const`
 
-  - Reports `const` variables that are read up to a configurable threshold and
-    can often be inlined.
-  - Set `{ maxUses: 2 }` to report const variables read up to two times. The
-    default is `1`.
-  - Skips exports, destructuring, `declare const`, and variables with
-    non-initializer writes.
-  - Set `{ ignoreConstantCase: true }` to skip names like `API_URL` and
-    `VARS_LIKE_THIS`.
+  - Reports module-level `const` variables with one to `maxUses` runtime reads.
+  - Skips exports, SCREAMING_SNAKE_CASE names, documented declarations,
+    destructuring, `declare const`, and variables with non-initializer writes.
+  - Type-only references such as `z.infer<typeof schema>` do not count as uses.
+
+- `zachs-rules/prefer-inline-single-use-local-const`
+
+  - Reports local `const` variables with exactly one runtime read.
+  - Skips loop bindings, explicitly annotated variables, destructuring,
+    declarations without initializers, and variables with later writes.
+
+- `zachs-rules/no-single-use-type-alias`
+
+  - Reports non-exported type aliases referenced only once.
 
 - `zachs-rules/prefer-object-spread-for-exact-object-map`
 
@@ -40,38 +46,23 @@ The object-map rules intentionally skip renamed properties, computed
 properties, already-spread objects, single-property mappings, unions, and
 unknown-like source types.
 
-### Oxlint
-
 - `zachs-rules/require-disable-directive-description`
   - Reports disable directives recognized by oxlint that do not include a
     description after `--`.
 
-## ESLint Usage
+## Usage
+
+The rules are enabled by the two concrete configs shipped from
+`@zachsents/oxlint-config`.
 
 ```ts
 // eslint.config.ts
-import { defineConfig } from "eslint/config"
-import zachsRules from "eslint-plugin-zachs-rules"
-
-export default defineConfig([zachsRules.configs["recommended-type-checked"]])
+export { default } from "@zachsents/oxlint-config/eslint"
 ```
-
-Use `zachsRules.configs.recommended` to enable only the non-type-aware
-`no-single-use-const` rule. The `recommended-type-checked` preset enables every
-ESLint rule, configures `@typescript-eslint/parser`, and uses the TypeScript
-project service. Both presets configure `no-single-use-const` with
-`{ ignoreConstantCase: true, maxUses: 3 }`.
-
-## Oxlint Usage
 
 ```ts
 // oxlint.config.ts
-import { defineConfig } from "oxlint"
-import recommended from "eslint-plugin-zachs-rules/oxlint/recommended"
-
-export default defineConfig({
-  extends: [recommended],
-})
+export { default } from "@zachsents/oxlint-config"
 ```
 
 Loading `oxlint.config.ts` requires Node.js `^20.19.0` or `>=22.18.0`.

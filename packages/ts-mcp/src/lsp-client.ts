@@ -5,6 +5,7 @@ import { z } from "zod"
 
 const REQUEST_TIMEOUT_MS = 30_000
 
+/** JSON-RPC response and server-request envelope accepted from tsgo. */
 const jsonRpcMessageSchema = z.object({
   jsonrpc: z.literal("2.0"),
   id: z.union([z.number(), z.string()]).optional(),
@@ -20,28 +21,14 @@ const jsonRpcMessageSchema = z.object({
     .optional(),
 })
 
-type JsonRpcMessage = z.infer<typeof jsonRpcMessageSchema>
-
-const hoverResultSchema = z.object({
-  contents: z.unknown(),
-})
-
-/** MarkupContent shape: `{ kind, value }` or just a raw `{ value }` string */
-const markupContentSchema = z.object({ value: z.string() })
-
-// Shared LSP building blocks
+/** Shared LSP position shape. */
 const positionSchema = z.object({ line: z.number(), character: z.number() })
 const rangeSchema = z.object({ start: positionSchema, end: positionSchema })
 
-// Definition/references response — can be Location or LocationLink
+/** Location shape returned by definition and reference requests. */
 const locationSchema = z.object({ uri: z.string(), range: rangeSchema })
-const locationLinkSchema = z.object({
-  targetUri: z.string(),
-  targetRange: rangeSchema,
-  targetSelectionRange: rangeSchema.optional(),
-})
 
-// Diagnostics
+/** Diagnostic item shape returned by tsgo. */
 const diagnosticItemSchema = z.object({
   range: rangeSchema,
   severity: z.number().optional(),
@@ -49,23 +36,9 @@ const diagnosticItemSchema = z.object({
   source: z.string().optional(),
   message: z.string(),
 })
-const diagnosticResultSchema = z.object({
-  kind: z.string(),
-  items: z.array(diagnosticItemSchema),
-})
 
-// Code actions
+/** Text-edit shape shared by code actions and workspace edits. */
 const textEditSchema = z.object({ range: rangeSchema, newText: z.string() })
-const codeActionSchema = z.object({
-  title: z.string(),
-  kind: z.string().optional(),
-  diagnostics: z.array(diagnosticItemSchema).optional(),
-  edit: z
-    .object({
-      changes: z.record(z.string(), z.array(textEditSchema)).optional(),
-    })
-    .optional(),
-})
 
 export interface LspLocation {
   file: string
@@ -100,14 +73,6 @@ export interface LspCodeAction {
   edits: LspTextEdit[]
 }
 
-// Document symbols — tsgo returns flat SymbolInformation[], not hierarchical
-const symbolInformationSchema = z.object({
-  name: z.string(),
-  kind: z.number(),
-  containerName: z.string().optional(),
-  location: locationSchema,
-})
-
 const SYMBOL_KIND_LABELS: Record<number, string> = {
   1: "file",
   2: "module",
@@ -133,23 +98,6 @@ export interface LspSymbol {
   character: number
   children: LspSymbol[]
 }
-
-// Workspace edit (shared by rename and code actions)
-const workspaceEditSchema = z.object({
-  changes: z.record(z.string(), z.array(textEditSchema)).optional(),
-})
-
-// Inlay hints
-const inlayHintLabelSchema = z.union([
-  z.string(),
-  z.array(z.object({ value: z.string() })),
-])
-
-const inlayHintSchema = z.object({
-  position: positionSchema,
-  label: inlayHintLabelSchema,
-  kind: z.number().optional(),
-})
 
 const INLAY_HINT_KIND_LABELS: Record<number, string> = {
   1: "type",
@@ -244,7 +192,7 @@ export class LspClient {
       position: { line, character },
     })
 
-    const parsed = hoverResultSchema.safeParse(result)
+    const parsed = z.object({ contents: z.unknown() }).safeParse(result)
     if (!parsed.success) return null
 
     return formatHoverContents(parsed.data.contents)
@@ -280,17 +228,22 @@ export class LspClient {
       textDocument: { uri },
     })
 
-    const parsed = diagnosticResultSchema.safeParse(result)
+    const parsed = z
+      .object({
+        kind: z.string(),
+        items: z.array(diagnosticItemSchema),
+      })
+      .safeParse(result)
     if (!parsed.success) return []
 
-    return parsed.data.items.map((item) => ({
-      line: item.range.start.line,
-      character: item.range.start.character,
-      endLine: item.range.end.line,
-      endCharacter: item.range.end.character,
-      severity: SEVERITY_LABELS[item.severity ?? 1] ?? "error",
-      message: item.message,
-      code: item.code,
+    return parsed.data.items.map(({ code, message, range, severity }) => ({
+      line: range.start.line,
+      character: range.start.character,
+      endLine: range.end.line,
+      endCharacter: range.end.character,
+      severity: SEVERITY_LABELS[severity ?? 1] ?? "error",
+      message,
+      code,
     }))
   }
 
@@ -308,27 +261,48 @@ export class LspClient {
     const uri = pathToUri(filePath)
     await this.ensureDocumentOpen(filePath, uri)
 
-    const lspDiagnostics = diagnostics.map((d) => ({
-      range: {
-        start: { line: d.line, character: d.character },
-        end: { line: d.endLine, character: d.endCharacter },
-      },
-      severity: SEVERITY_LABELS.indexOf(d.severity) || 1,
-      message: d.message,
-      ...(d.code != null ? { code: d.code } : {}),
-    }))
-
     const result: unknown = await this.sendRequest("textDocument/codeAction", {
       textDocument: { uri },
       range,
-      context: { diagnostics: lspDiagnostics },
+      context: {
+        diagnostics: diagnostics.map(
+          ({
+            character,
+            code,
+            endCharacter,
+            endLine,
+            line,
+            message,
+            severity,
+          }) => ({
+            range: {
+              start: { line, character },
+              end: { line: endLine, character: endCharacter },
+            },
+            severity: SEVERITY_LABELS.indexOf(severity) || 1,
+            message,
+            ...(code != null ? { code } : {}),
+          }),
+        ),
+      },
     })
 
     if (!Array.isArray(result)) return []
 
     const actions: LspCodeAction[] = []
     for (const item of result) {
-      const parsed = codeActionSchema.safeParse(item)
+      const parsed = z
+        .object({
+          title: z.string(),
+          kind: z.string().optional(),
+          diagnostics: z.array(diagnosticItemSchema).optional(),
+          edit: z
+            .object({
+              changes: z.record(z.string(), z.array(textEditSchema)).optional(),
+            })
+            .optional(),
+        })
+        .safeParse(item)
       if (!parsed.success || !parsed.data.edit) continue
 
       actions.push({
@@ -402,19 +376,26 @@ export class LspClient {
 
     const hints: LspInlayHint[] = []
     for (const item of result) {
-      const parsed = inlayHintSchema.safeParse(item)
+      const parsed = z
+        .object({
+          position: positionSchema,
+          label: z.union([
+            z.string(),
+            z.array(z.object({ value: z.string() })),
+          ]),
+          kind: z.number().optional(),
+        })
+        .safeParse(item)
       if (!parsed.success) continue
 
       const label = parsed.data.label
-      const text =
-        typeof label === "string"
-          ? label
-          : label.map((part) => part.value).join("")
-
       hints.push({
         line: parsed.data.position.line,
         character: parsed.data.position.character,
-        text,
+        text:
+          typeof label === "string"
+            ? label
+            : label.map((part) => part.value).join(""),
         kind: INLAY_HINT_KIND_LABELS[parsed.data.kind ?? 0] ?? "unknown",
       })
     }
@@ -477,10 +458,9 @@ export class LspClient {
    */
   private async refreshOpenDocuments(): Promise<void> {
     for (const [uri, state] of this.documents) {
-      const filePath = uriToPath(uri)
       let content: string
       try {
-        content = await readFile(filePath, "utf-8")
+        content = await readFile(uriToPath(uri), "utf-8")
       } catch {
         continue
       }
@@ -531,16 +511,18 @@ export class LspClient {
   private sendRequest(method: string, params: unknown): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const id = this.nextId++
-      const timer = setTimeout(() => {
-        this.pending.delete(id)
-        reject(
-          new Error(
-            `Request "${method}" timed out after ${REQUEST_TIMEOUT_MS}ms`,
-          ),
-        )
-      }, REQUEST_TIMEOUT_MS)
-
-      this.pending.set(id, { resolve, reject, timer })
+      this.pending.set(id, {
+        resolve,
+        reject,
+        timer: setTimeout(() => {
+          this.pending.delete(id)
+          reject(
+            new Error(
+              `Request "${method}" timed out after ${REQUEST_TIMEOUT_MS}ms`,
+            ),
+          )
+        }, REQUEST_TIMEOUT_MS),
+      })
       this.send({ jsonrpc: "2.0", id, method, params })
     })
   }
@@ -555,8 +537,9 @@ export class LspClient {
 
   private send(message: object): void {
     const body = JSON.stringify(message)
-    const header = `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n`
-    this.stdin.write(header + body)
+    this.stdin.write(
+      `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`,
+    )
   }
 
   /** Parse Content-Length framed messages from the buffer */
@@ -565,28 +548,30 @@ export class LspClient {
       const headerEnd = this.buffer.indexOf("\r\n\r\n")
       if (headerEnd === -1) return
 
-      const header = this.buffer.subarray(0, headerEnd).toString("ascii")
-      const match = header.match(/Content-Length:\s*(\d+)/)
+      const match = this.buffer
+        .subarray(0, headerEnd)
+        .toString("ascii")
+        .match(/Content-Length:\s*(\d+)/)
       if (!match) {
         this.buffer = this.buffer.subarray(headerEnd + 4)
         continue
       }
 
-      const contentLength = Number.parseInt(match[1] ?? "0", 10)
       const bodyStart = headerEnd + 4
-      const bodyEnd = bodyStart + contentLength
+      const bodyEnd = bodyStart + Number.parseInt(match[1] ?? "0", 10)
 
       if (this.buffer.length < bodyEnd) return
 
-      const body = this.buffer.subarray(bodyStart, bodyEnd).toString("utf-8")
+      const parsed = jsonRpcMessageSchema.safeParse(
+        JSON.parse(this.buffer.subarray(bodyStart, bodyEnd).toString("utf-8")),
+      )
       this.buffer = this.buffer.subarray(bodyEnd)
 
-      const parsed = jsonRpcMessageSchema.safeParse(JSON.parse(body))
       if (parsed.success) this.handleMessage(parsed.data)
     }
   }
 
-  private handleMessage(message: JsonRpcMessage): void {
+  private handleMessage(message: z.infer<typeof jsonRpcMessageSchema>): void {
     // Response to one of our requests (numeric id, no method)
     if (typeof message.id === "number" && !message.method) {
       const pending = this.pending.get(message.id)
@@ -630,10 +615,9 @@ function uriToPath(uri: string): string {
  */
 function parseLocations(result: unknown): LspLocation[] {
   if (result == null) return []
-  const items = Array.isArray(result) ? result : [result]
   const locations: LspLocation[] = []
 
-  for (const item of items) {
+  for (const item of Array.isArray(result) ? result : [result]) {
     const loc = locationSchema.safeParse(item)
     if (loc.success) {
       locations.push({
@@ -644,7 +628,13 @@ function parseLocations(result: unknown): LspLocation[] {
       continue
     }
 
-    const link = locationLinkSchema.safeParse(item)
+    const link = z
+      .object({
+        targetUri: z.string(),
+        targetRange: rangeSchema,
+        targetSelectionRange: rangeSchema.optional(),
+      })
+      .safeParse(item)
     if (link.success) {
       const range = link.data.targetSelectionRange ?? link.data.targetRange
       locations.push({
@@ -666,7 +656,14 @@ function buildSymbolTree(items: unknown[]): LspSymbol[] {
   const flat: Array<{ symbol: LspSymbol; containerName?: string }> = []
 
   for (const item of items) {
-    const parsed = symbolInformationSchema.safeParse(item)
+    const parsed = z
+      .object({
+        name: z.string(),
+        kind: z.number(),
+        containerName: z.string().optional(),
+        location: locationSchema,
+      })
+      .safeParse(item)
     if (!parsed.success) continue
 
     flat.push({
@@ -706,15 +703,18 @@ function buildSymbolTree(items: unknown[]): LspSymbol[] {
 
 /** Parse a WorkspaceEdit into flat LspTextEdit[] */
 function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
-  const parsed = workspaceEditSchema.safeParse(result)
+  const parsed = z
+    .object({
+      changes: z.record(z.string(), z.array(textEditSchema)).optional(),
+    })
+    .safeParse(result)
   if (!parsed.success || !parsed.data.changes) return []
 
   const edits: LspTextEdit[] = []
   for (const [editUri, textEdits] of Object.entries(parsed.data.changes)) {
-    const file = uriToPath(editUri)
     for (const te of textEdits) {
       edits.push({
-        file,
+        file: uriToPath(editUri),
         startLine: te.range.start.line,
         startCharacter: te.range.start.character,
         endLine: te.range.end.line,
@@ -728,8 +728,7 @@ function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
 
 /** Return the LSP language identifier for a source file. */
 function getLanguageId(filePath: string): string {
-  const ext = extname(filePath)
-  switch (ext) {
+  switch (extname(filePath)) {
     case ".ts":
     case ".mts":
     case ".cts":
@@ -760,7 +759,7 @@ function formatHoverContents(contents: unknown): string | null {
     return parts.length > 0 ? parts.join("\n\n") : null
   }
 
-  const markup = markupContentSchema.safeParse(contents)
+  const markup = z.object({ value: z.string() }).safeParse(contents)
   if (markup.success) return markup.data.value
 
   return null

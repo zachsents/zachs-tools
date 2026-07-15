@@ -20,7 +20,7 @@ export function resolveTsgoBinary(): string {
   }
 
   const exe = process.platform === "win32" ? "tsgo.exe" : "tsgo"
-  const candidates = [
+  for (const candidate of [
     join(
       homedir(),
       ".bun",
@@ -32,9 +32,7 @@ export function resolveTsgoBinary(): string {
       exe,
     ),
     join("/usr", "local", "lib", "node_modules", PLATFORM_PACKAGE, "lib", exe),
-  ]
-
-  for (const candidate of candidates) {
+  ]) {
     if (existsSync(candidate)) return candidate
   }
 

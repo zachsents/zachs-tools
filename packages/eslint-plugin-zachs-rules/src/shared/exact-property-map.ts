@@ -11,17 +11,15 @@ export type SourceMappingGroup = {
   mappings: ExactPropertyMapping[]
 }
 
-type GroupState = SourceMappingGroup & {
-  hasExistingSpread: boolean
-}
-
 /** Read a static property name from an object property key. */
-function getStaticPropertyName(key: TSESTree.Property["key"]): string | null {
+function getStaticPropertyName(
+  key: TSESTree.PropertyNameNonComputed,
+): string | null {
   if (key.type === AST_NODE_TYPES.Identifier) {
     return key.name
   }
 
-  if (key.type === AST_NODE_TYPES.Literal && typeof key.value === "string") {
+  if (typeof key.value === "string") {
     return key.value
   }
 
@@ -88,7 +86,10 @@ export function findSameNamedSourceMappings(
   objectExpression: TSESTree.ObjectExpression,
   minProperties: number,
 ): SourceMappingGroup[] {
-  const groups = new Map<string, GroupState>()
+  const groups = new Map<
+    string,
+    SourceMappingGroup & { hasExistingSpread: boolean }
+  >()
 
   for (const property of objectExpression.properties) {
     if (property.type === AST_NODE_TYPES.SpreadElement) {

@@ -9,8 +9,11 @@
   },
   "peerDependencies": {
     "@tanstack/eslint-plugin-router": ">=1",
+    "@typescript-eslint/parser": "^8.62.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-react-hooks": ">=6",
+    "eslint-plugin-zachs-rules": "workspace:*",
     "oxlint": ">=1.74.0"
   },
   "exports": {
@@ -21,9 +24,13 @@
     "./react": {
       "types": "./dist/react.d.ts",
       "default": "./dist/react.js"
+    },
+    "./eslint": {
+      "types": "./dist/eslint.d.ts",
+      "default": "./dist/eslint.js"
     }
   },
-  "description": "Zach's shared oxlint configuration.",
+  "description": "Zach's shared Oxlint and ESLint configuration.",
   "files": [
     "dist"
   ],
@@ -50,7 +57,8 @@
   "zshy": {
     "exports": {
       ".": "./index.ts",
-      "./react": "./react.ts"
+      "./react": "./react.ts",
+      "./eslint": "./eslint.ts"
     },
     "cjs": false
   }

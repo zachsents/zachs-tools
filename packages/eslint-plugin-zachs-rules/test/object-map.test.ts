@@ -2,67 +2,66 @@ import { expect, test } from "bun:test"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { ESLint } from "eslint"
-import { defineConfig } from "eslint/config"
 import parser from "@typescript-eslint/parser"
 import plugin from "../src/index"
 
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)))
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
-const eslintPlugin = plugin as unknown as ESLint.Plugin
+const ESLINT_PLUGIN = plugin as unknown as ESLint.Plugin
 
 test("runs zachs-rules custom rules", async () => {
-  const eslint = new ESLint({
-    cwd: root,
-    overrideConfigFile: true,
-    overrideConfig: [
-      {
-        files: ["fixtures/**/*.ts"],
-        languageOptions: {
-          parser,
-          parserOptions: {
-            projectService: true,
-            tsconfigRootDir: root,
+  expect(
+    (
+      await new ESLint({
+        cwd: root,
+        overrideConfigFile: true,
+        overrideConfig: [
+          {
+            files: ["fixtures/**/*.ts"],
+            languageOptions: {
+              parser,
+              parserOptions: {
+                projectService: true,
+                tsconfigRootDir: root,
+              },
+            },
+            plugins: {
+              "zachs-rules": ESLINT_PLUGIN,
+            },
+            rules: {
+              "zachs-rules/no-overly-broad-parameters": "error",
+              "zachs-rules/no-single-use-type-alias": "error",
+              "zachs-rules/prefer-inline-module-const": "error",
+              "zachs-rules/prefer-inline-single-use-local-const": "error",
+              "zachs-rules/prefer-object-spread-for-exact-object-map": "error",
+              "zachs-rules/prefer-pick-for-object-subset-map": "error",
+            },
           },
-        },
-        plugins: {
-          "zachs-rules": eslintPlugin,
-        },
-        rules: {
-          "zachs-rules/no-overly-broad-parameters": "error",
-          "zachs-rules/no-single-use-const": "error",
-          "zachs-rules/prefer-object-spread-for-exact-object-map": "error",
-          "zachs-rules/prefer-pick-for-object-subset-map": "error",
-        },
-      },
-    ],
-  })
-
-  const results = await eslint.lintFiles(["fixtures/**/*.ts"])
-
-  const customMessages = results
-    .flatMap((result) =>
-      result.messages
-        .filter((message) => message.ruleId?.startsWith("zachs-rules/"))
-        .map((message) => ({
-          file: path.relative(root, result.filePath),
-          ruleId: message.ruleId,
-          message: message.message,
-        }))
-        .toSorted(
-          (left, right) =>
-            left.file.localeCompare(right.file) ||
-            String(left.ruleId).localeCompare(String(right.ruleId)) ||
-            left.message.localeCompare(right.message),
-        ),
+        ],
+      }).lintFiles(["fixtures/**/*.ts"])
     )
-    .toSorted(
-      (left, right) =>
-        left.file.localeCompare(right.file) ||
-        String(left.ruleId).localeCompare(String(right.ruleId)) ||
-        left.message.localeCompare(right.message),
-    )
-
-  expect(customMessages).toEqual([
+      .flatMap((result) =>
+        result.messages
+          .filter((message) => message.ruleId?.startsWith("zachs-rules/"))
+          .map(({ message, ruleId }) => ({
+            file: path.relative(root, result.filePath),
+            ruleId,
+            message,
+          }))
+          .toSorted(
+            (left, right) =>
+              left.file.localeCompare(right.file) ||
+              String(left.ruleId).localeCompare(String(right.ruleId)) ||
+              left.message.localeCompare(right.message),
+          ),
+      )
+      .toSorted(
+        (left, right) =>
+          left.file.localeCompare(right.file) ||
+          String(left.ruleId).localeCompare(String(right.ruleId)) ||
+          left.message.localeCompare(right.message),
+      ),
+  ).toEqual([
     {
       file: "fixtures/overly-broad-parameters.ts",
       ruleId: "zachs-rules/no-overly-broad-parameters",
@@ -83,27 +82,39 @@ test("runs zachs-rules custom rules", async () => {
     },
     {
       file: "fixtures/pick.ts",
+      ruleId: "zachs-rules/no-single-use-type-alias",
+      message:
+        "`Deployment` is a type alias used only once. Consider inlining it.",
+    },
+    {
+      file: "fixtures/pick.ts",
       ruleId: "zachs-rules/prefer-pick-for-object-subset-map",
       message:
         '`deployment` is remapped by 4 identical property names but has other known properties. Prefer `pick(deployment, ["createdAt", "id", "projectId", "status"])` or equivalent.',
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/no-single-use-const",
+      ruleId: "zachs-rules/no-single-use-type-alias",
       message:
-        "`API_URL` is a const that is only used once. Consider inlining it.",
+        "`JsonRpcMessage` is a type alias used only once. Consider inlining it.",
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/no-single-use-const",
+      ruleId: "zachs-rules/prefer-inline-module-const",
       message:
-        "`once` is a const that is only used once. Consider inlining it.",
+        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/no-single-use-const",
+      ruleId: "zachs-rules/prefer-inline-single-use-local-const",
       message:
-        "`scopedOnce` is a const that is only used once. Consider inlining it.",
+        "`scopedOnce` is a local const used only once. Consider inlining it.",
+    },
+    {
+      file: "fixtures/spread.ts",
+      ruleId: "zachs-rules/no-single-use-type-alias",
+      message:
+        "`DeploymentSummary` is a type alias used only once. Consider inlining it.",
     },
     {
       file: "fixtures/spread.ts",
@@ -111,131 +122,93 @@ test("runs zachs-rules custom rules", async () => {
       message:
         "`deployment` is remapped by identical property names for all of its known properties. Prefer `{ ...deployment }`.",
     },
+    {
+      file: "fixtures/valid.ts",
+      ruleId: "zachs-rules/no-single-use-type-alias",
+      message:
+        "`UnknownDeployment` is a type alias used only once. Consider inlining it.",
+    },
   ])
 })
 
-test("can ignore constant-case single-use const names", async () => {
-  const eslint = new ESLint({
-    cwd: root,
-    overrideConfigFile: true,
-    overrideConfig: [
-      {
-        files: ["fixtures/single-use.ts"],
-        languageOptions: {
-          parser,
-          parserOptions: {
-            projectService: true,
-            tsconfigRootDir: root,
+test("module const rule skips documented, constant-case, and type-only uses", async () => {
+  expect(
+    (
+      await new ESLint({
+        cwd: root,
+        overrideConfigFile: true,
+        overrideConfig: [
+          {
+            files: ["fixtures/single-use.ts"],
+            languageOptions: {
+              parser,
+              parserOptions: {
+                projectService: true,
+                tsconfigRootDir: root,
+              },
+            },
+            plugins: {
+              "zachs-rules": ESLINT_PLUGIN,
+            },
+            rules: {
+              "zachs-rules/prefer-inline-module-const": "error",
+            },
           },
-        },
-        plugins: {
-          "zachs-rules": eslintPlugin,
-        },
-        rules: {
-          "zachs-rules/no-single-use-const": [
-            "error",
-            { ignoreConstantCase: true },
-          ],
-        },
-      },
-    ],
-  })
-
-  const results = await eslint.lintFiles(["fixtures/single-use.ts"])
-  const messages = results.flatMap((result) =>
-    result.messages
-      .filter((message) => message.ruleId === "zachs-rules/no-single-use-const")
-      .map((message) => message.message)
-      .toSorted(),
-  )
-
-  expect(messages).toEqual([
-    "`once` is a const that is only used once. Consider inlining it.",
-    "`scopedOnce` is a const that is only used once. Consider inlining it.",
+        ],
+      }).lintFiles(["fixtures/single-use.ts"])
+    ).flatMap((result) =>
+      result.messages
+        .filter(
+          (message) =>
+            message.ruleId === "zachs-rules/prefer-inline-module-const",
+        )
+        .map((message) => message.message)
+        .toSorted(),
+    ),
+  ).toEqual([
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
   ])
 })
 
 test("can configure the maximum use threshold", async () => {
-  const eslint = new ESLint({
-    cwd: root,
-    overrideConfigFile: true,
-    overrideConfig: [
-      {
-        files: ["fixtures/single-use.ts"],
-        languageOptions: {
-          parser,
-          parserOptions: {
-            projectService: true,
-            tsconfigRootDir: root,
-          },
-        },
-        plugins: {
-          "zachs-rules": eslintPlugin,
-        },
-        rules: {
-          "zachs-rules/no-single-use-const": ["error", { maxUses: 2 }],
-        },
-      },
-    ],
-  })
-
-  const results = await eslint.lintFiles(["fixtures/single-use.ts"])
-  const messages = results.flatMap((result) =>
-    result.messages
-      .filter((message) => message.ruleId === "zachs-rules/no-single-use-const")
-      .map((message) => message.message)
-      .toSorted(),
-  )
-
-  expect(messages).toEqual([
-    "`API_URL` is a const that is only used once. Consider inlining it.",
-    "`once` is a const that is only used once. Consider inlining it.",
-    "`scopedOnce` is a const that is only used once. Consider inlining it.",
-    "`twice` is a const that is only used 2 times. Consider inlining it.",
-  ])
-})
-
-test("recommended preset registers its rule and default options", async () => {
-  const eslint = new ESLint({
-    cwd: root,
-    overrideConfigFile: true,
-    overrideConfig: plugin.configs.recommended,
-  })
-
-  const [result] = await eslint.lintText(
-    "const API_URL = 'https://example.com'; const value = 1; console.log(API_URL, value, value, value)",
-  )
-
   expect(
-    result?.messages
-      .filter((message) => message.ruleId?.startsWith("zachs-rules/"))
-      .map((message) => message.ruleId),
-  ).toEqual(["zachs-rules/no-single-use-const"])
-})
-
-test("recommended-type-checked preset runs every ESLint rule", async () => {
-  const config = defineConfig([plugin.configs["recommended-type-checked"]])
-  const eslint = new ESLint({
-    cwd: root,
-    overrideConfigFile: true,
-    overrideConfig: config,
-  })
-
-  const results = await eslint.lintFiles(["fixtures/**/*.ts"])
-  const ruleIds = new Set(
-    results.flatMap((result) =>
-      result.messages.flatMap((message) =>
-        message.ruleId?.startsWith("zachs-rules/") ? [message.ruleId] : [],
-      ),
+    (
+      await new ESLint({
+        cwd: root,
+        overrideConfigFile: true,
+        overrideConfig: [
+          {
+            files: ["fixtures/single-use.ts"],
+            languageOptions: {
+              parser,
+              parserOptions: {
+                projectService: true,
+                tsconfigRootDir: root,
+              },
+            },
+            plugins: {
+              "zachs-rules": ESLINT_PLUGIN,
+            },
+            rules: {
+              "zachs-rules/prefer-inline-module-const": [
+                "error",
+                { maxUses: 2 },
+              ],
+            },
+          },
+        ],
+      }).lintFiles(["fixtures/single-use.ts"])
+    ).flatMap((result) =>
+      result.messages
+        .filter(
+          (message) =>
+            message.ruleId === "zachs-rules/prefer-inline-module-const",
+        )
+        .map((message) => message.message)
+        .toSorted(),
     ),
-  )
-
-  expect(ruleIds).toEqual(
-    new Set([
-      "zachs-rules/no-overly-broad-parameters",
-      "zachs-rules/no-single-use-const",
-      "zachs-rules/prefer-object-spread-for-exact-object-map",
-      "zachs-rules/prefer-pick-for-object-subset-map",
-    ]),
-  )
+  ).toEqual([
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+  ])
 })

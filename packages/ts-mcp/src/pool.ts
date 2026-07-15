@@ -52,16 +52,17 @@ export class TsgoPool {
     const client = await this.getClient(filePath)
     const diagnostics = await client.diagnostics(filePath)
 
-    const actions = await client.codeActions(
-      filePath,
-      {
-        start: { line: 0, character: 0 },
-        end: { line: 1_000_000, character: 0 },
-      },
+    return {
       diagnostics,
-    )
-
-    return { diagnostics, actions }
+      actions: await client.codeActions(
+        filePath,
+        {
+          start: { line: 0, character: 0 },
+          end: { line: 1_000_000, character: 0 },
+        },
+        diagnostics,
+      ),
+    }
   }
 
   /** Find all references to a symbol */
@@ -70,14 +71,16 @@ export class TsgoPool {
     line: number,
     character: number,
   ): Promise<LspLocation[]> {
-    const client = await this.getClient(filePath)
-    return client.references(filePath, line, character)
+    return (await this.getClient(filePath)).references(
+      filePath,
+      line,
+      character,
+    )
   }
 
   /** Get a structured outline of all symbols in a file */
   async outline(filePath: string): Promise<LspSymbol[]> {
-    const client = await this.getClient(filePath)
-    return client.documentSymbols(filePath)
+    return (await this.getClient(filePath)).documentSymbols(filePath)
   }
 
   /** Rename a symbol across the project */
@@ -87,8 +90,12 @@ export class TsgoPool {
     character: number,
     newName: string,
   ): Promise<LspTextEdit[]> {
-    const client = await this.getClient(filePath)
-    return client.rename(filePath, line, character, newName)
+    return (await this.getClient(filePath)).rename(
+      filePath,
+      line,
+      character,
+      newName,
+    )
   }
 
   /** Get inferred type annotations for a line range */
@@ -97,8 +104,11 @@ export class TsgoPool {
     startLine: number,
     endLine: number,
   ): Promise<LspInlayHint[]> {
-    const client = await this.getClient(filePath)
-    return client.inlayHints(filePath, startLine, endLine)
+    return (await this.getClient(filePath)).inlayHints(
+      filePath,
+      startLine,
+      endLine,
+    )
   }
 
   /** Shut down all active LSP instances */
@@ -126,8 +136,10 @@ export class TsgoPool {
       this.entries.delete(projectRoot)
     }
 
-    const rootUri = `file://${projectRoot}`
-    const client = await LspClient.create(this.binaryPath, rootUri)
+    const client = await LspClient.create(
+      this.binaryPath,
+      `file://${projectRoot}`,
+    )
     const entry: PoolEntry = {
       client,
       idleTimer: this.startIdleTimer(projectRoot),

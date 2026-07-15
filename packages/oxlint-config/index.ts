@@ -8,6 +8,10 @@ export default defineConfig({
   plugins: ["eslint", "typescript", "unicorn", "oxc", "jsdoc"],
   jsPlugins: [
     {
+      name: "zachs-rules",
+      specifier: "eslint-plugin-zachs-rules/oxlint",
+    },
+    {
       name: "jsdoc-js",
       specifier: "eslint-plugin-jsdoc",
     },
@@ -16,6 +20,9 @@ export default defineConfig({
     "eslint/no-shadow": "off",
     "eslint/no-underscore-dangle": "off",
     "jsdoc-js/require-jsdoc": ["error", { enableFixer: false }],
+    "zachs-rules/prefer-inline-module-const": ["error", { maxUses: 3 }],
+    "zachs-rules/prefer-inline-single-use-local-const": "error",
+    "zachs-rules/require-disable-directive-description": "error",
     "typescript/consistent-return": "off",
     "typescript/no-explicit-any": "error",
     "typescript/no-empty-object-type": [

@@ -1,9 +1,11 @@
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from "@typescript-eslint/utils"
+import {
+  AST_NODE_TYPES,
+  ESLintUtils,
+  type ParserServicesWithTypeInformation,
+  TSESTree,
+} from "@typescript-eslint/utils"
 import ts from "typescript"
-
-type Options = []
-
-type MessageIds = "overlyBroadParameter"
+import { createRule } from "../shared/create-rule"
 
 type ParameterCandidate = {
   argumentIndex: number
@@ -14,19 +16,6 @@ type ParameterCandidate = {
   observedTypes: ts.Type[]
   tsNode: ts.ParameterDeclaration
 }
-
-type FunctionCandidate = {
-  callCount: number
-  declarationName: ts.Identifier
-  invalid: boolean
-  name: string
-  parameters: ParameterCandidate[]
-  symbol: ts.Symbol
-}
-
-const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/zachsents/eslint-plugin-zachs-rules#${name}`,
-)
 
 /** Check whether a declaration is exported. */
 function isExported(node: TSESTree.Node): boolean {
@@ -87,7 +76,7 @@ function findCommonObservedType(
 function getFunctionNameSymbol(
   checker: ts.TypeChecker,
   node: TSESTree.Identifier,
-  services: ReturnType<typeof ESLintUtils.getParserServices>,
+  services: ParserServicesWithTypeInformation,
 ): { declarationName: ts.Identifier; symbol: ts.Symbol } | null {
   const declarationName = services.esTreeNodeToTSNodeMap.get(node)
   if (!ts.isIdentifier(declarationName)) return null
@@ -109,12 +98,10 @@ function getParameters(
 
   for (const [index, node] of estreeParameters.entries()) {
     const tsNode = tsParameters.at(index)
-    const isThisParameter =
-      tsNode && ts.isIdentifier(tsNode.name) && tsNode.name.text === "this"
+    if (tsNode && ts.isIdentifier(tsNode.name) && tsNode.name.text === "this") {
+      continue
+    }
 
-    if (isThisParameter) continue
-
-    const parameterArgumentIndex = argumentIndex
     argumentIndex += 1
 
     if (
@@ -127,7 +114,7 @@ function getParameters(
     }
 
     parameters.push({
-      argumentIndex: parameterArgumentIndex,
+      argumentIndex: argumentIndex - 1,
       declaredType: checker.getTypeFromTypeNode(tsNode.type),
       invalid: false,
       name: node.name,
@@ -140,7 +127,7 @@ function getParameters(
   return parameters
 }
 
-export default createRule<Options, MessageIds>({
+export default createRule<[], "overlyBroadParameter">({
   name: "no-overly-broad-parameters",
   meta: {
     type: "suggestion",
@@ -161,7 +148,14 @@ export default createRule<Options, MessageIds>({
     const sourceFile = services.esTreeNodeToTSNodeMap.get(
       context.sourceCode.ast,
     )
-    const candidates: FunctionCandidate[] = []
+    const candidates: Array<{
+      callCount: number
+      declarationName: ts.Identifier
+      invalid: boolean
+      name: string
+      parameters: ParameterCandidate[]
+      symbol: ts.Symbol
+    }> = []
 
     /** Add a locally declared function to the candidate set. */
     function addCandidate(
@@ -177,22 +171,20 @@ export default createRule<Options, MessageIds>({
 
       candidates.push({
         callCount: 0,
-        declarationName: nameSymbol.declarationName,
+        ...nameSymbol,
         invalid: false,
         name: nameNode.name,
         parameters,
-        symbol: nameSymbol.symbol,
       })
     }
 
     /** Inspect references and collect argument types for candidate functions. */
     function inspectReferences() {
-      const bySymbol = new Map(
-        candidates.map((candidate) => [candidate.symbol, candidate]),
-      )
-
       /** Visit TypeScript nodes to associate calls with candidates. */
-      function visit(node: ts.Node) {
+      function visit(
+        node: ts.Node,
+        bySymbol: Map<ts.Symbol, (typeof candidates)[number]>,
+      ) {
         if (ts.isIdentifier(node)) {
           const resolvedSymbol = checker.getSymbolAtLocation(node)
           const symbol =
@@ -224,16 +216,25 @@ export default createRule<Options, MessageIds>({
           }
         }
 
-        ts.forEachChild(node, visit)
+        ts.forEachChild(node, (child) => visit(child, bySymbol))
       }
 
-      const sourceFiles = ts.isExternalModule(sourceFile)
-        ? [sourceFile]
-        : services.program
-            .getSourceFiles()
-            .filter((file) => !file.isDeclarationFile)
+      /** Visit source files with one shared candidate index. */
+      function visitFiles(
+        files: ts.SourceFile[],
+        bySymbol: Map<ts.Symbol, (typeof candidates)[number]>,
+      ) {
+        for (const file of files) visit(file, bySymbol)
+      }
 
-      for (const file of sourceFiles) visit(file)
+      visitFiles(
+        ts.isExternalModule(sourceFile)
+          ? [sourceFile]
+          : services.program
+              .getSourceFiles()
+              .filter((file) => !file.isDeclarationFile),
+        new Map(candidates.map((candidate) => [candidate.symbol, candidate])),
+      )
     }
 
     /** Report parameters that can be narrowed at every direct callsite. */
@@ -267,24 +268,21 @@ export default createRule<Options, MessageIds>({
             continue
           }
 
-          const observedTypeName = checker.typeToString(
-            observedType,
-            parameter.tsNode,
-            typeFormatFlags,
-          )
-          const declaredTypeName = checker.typeToString(
-            parameter.declaredType,
-            parameter.tsNode,
-            typeFormatFlags,
-          )
-
           context.report({
             node: parameter.node,
             messageId: "overlyBroadParameter",
             data: {
-              declaredType: declaredTypeName,
+              declaredType: checker.typeToString(
+                parameter.declaredType,
+                parameter.tsNode,
+                typeFormatFlags,
+              ),
               functionName: candidate.name,
-              observedType: observedTypeName,
+              observedType: checker.typeToString(
+                observedType,
+                parameter.tsNode,
+                typeFormatFlags,
+              ),
               parameter: parameter.name,
             },
           })
