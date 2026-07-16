@@ -3,7 +3,13 @@ import { createRule } from "../shared/create-rule"
 import { findSameNamedSourceMappings } from "../shared/exact-property-map"
 import { getSourceShape } from "../shared/type-shape"
 
-/** Check whether mapped keys are a strict subset of source properties. */
+/**
+ * Check whether mapped keys are a strict subset of source properties.
+ *
+ * @param mappedKeys - Property names mapped by the object literal.
+ * @param sourceProperties - Statically known properties on the source object.
+ * @returns Whether the mapped keys form a strict subset of the source shape.
+ */
 function isStrictSubset(
   mappedKeys: Set<string>,
   sourceProperties: Set<string>,

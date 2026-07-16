@@ -6,7 +6,12 @@ import {
 
 type VariableDefinition = TSESLint.Scope.Definitions.VariableDefinition
 
-/** Find a simple initialized const definition for a variable. */
+/**
+ * Find a simple initialized const definition for a variable.
+ *
+ * @param variable - Scope variable to inspect.
+ * @returns Its initialized const definition, when supported.
+ */
 export function getConstDefinition(
   variable: TSESLint.Scope.Variable,
 ): VariableDefinition | undefined {
@@ -29,7 +34,12 @@ export function getConstDefinition(
   return definition
 }
 
-/** Check whether a declaration is directly exported. */
+/**
+ * Check whether a declaration is directly exported.
+ *
+ * @param definition - Variable definition to inspect.
+ * @returns Whether the declaration is directly exported.
+ */
 export function isExported(definition: VariableDefinition) {
   return (
     definition.parent.parent.type === AST_NODE_TYPES.ExportNamedDeclaration ||
@@ -37,7 +47,12 @@ export function isExported(definition: VariableDefinition) {
   )
 }
 
-/** Check whether a declaration belongs directly to the module. */
+/**
+ * Check whether a declaration belongs directly to the module.
+ *
+ * @param definition - Variable definition to inspect.
+ * @returns Whether the declaration belongs directly to the module.
+ */
 export function isModuleLevel(definition: VariableDefinition) {
   const parent = definition.parent.parent
 
@@ -49,7 +64,12 @@ export function isModuleLevel(definition: VariableDefinition) {
   )
 }
 
-/** Check whether a declaration creates a loop binding. */
+/**
+ * Check whether a declaration creates a loop binding.
+ *
+ * @param definition - Variable definition to inspect.
+ * @returns Whether the declaration creates a loop binding.
+ */
 export function isLoopVariable(definition: VariableDefinition) {
   const declaration = definition.parent
   const parent = declaration.parent
@@ -62,7 +82,12 @@ export function isLoopVariable(definition: VariableDefinition) {
   )
 }
 
-/** Check whether a variable is reassigned after initialization. */
+/**
+ * Check whether a variable is reassigned after initialization.
+ *
+ * @param variable - Scope variable to inspect.
+ * @returns Whether it is written after initialization.
+ */
 export function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
   return variable.references.some(
     (reference) => reference.isWrite() && reference.init !== true,
@@ -72,6 +97,10 @@ export function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
 /**
  * Count runtime reads, excluding value references made only through a type
  * query.
+ *
+ * @param variable - Scope variable whose references should be counted.
+ * @param sourceCode - Parsed source used to inspect reference ancestors.
+ * @returns The number of runtime read references.
  */
 export function countRuntimeReads(
   variable: TSESLint.Scope.Variable,
@@ -86,7 +115,13 @@ export function countRuntimeReads(
   ).length
 }
 
-/** Check whether a const declaration has an attached documentation comment. */
+/**
+ * Check whether a const declaration has an attached documentation comment.
+ *
+ * @param definition - Variable definition to inspect.
+ * @param sourceCode - Parsed source used to read leading comments.
+ * @returns Whether a documentation block precedes the declaration.
+ */
 export function hasDocumentationComment(
   definition: VariableDefinition,
   sourceCode: TSESLint.SourceCode,
@@ -99,7 +134,12 @@ export function hasDocumentationComment(
     )
 }
 
-/** Visit every scope in a scope tree. */
+/**
+ * Visit every scope in a scope tree.
+ *
+ * @param scope - Root scope to visit.
+ * @param visitor - Callback invoked for each scope.
+ */
 export function visitScopes(
   scope: TSESLint.Scope.Scope,
   visitor: (scope: TSESLint.Scope.Scope) => void,

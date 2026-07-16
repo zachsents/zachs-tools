@@ -264,7 +264,13 @@ server.registerTool(
   },
 )
 
-/** Recursively format a symbol tree with indentation */
+/**
+ * Recursively format a symbol tree with indentation
+ *
+ * @param symbols - Symbols at the current tree level.
+ * @param lines - Output lines accumulated during traversal.
+ * @param depth - Current indentation depth.
+ */
 function formatSymbolTree(
   symbols: LspSymbol[],
   lines: string[],
@@ -280,7 +286,12 @@ function formatSymbolTree(
   }
 }
 
-/** Format an LSP text edit for CLI output. */
+/**
+ * Format an LSP text edit for CLI output.
+ *
+ * @param edit - Text edit to render.
+ * @returns A human-readable summary of the edit.
+ */
 function formatTextEdit(edit: LspCodeAction["edits"][number]): string {
   const loc = `    ${edit.file}:${edit.startLine}:${edit.startCharacter}`
   if (edit.newText === "") {
@@ -301,6 +312,9 @@ function formatTextEdit(edit: LspCodeAction["edits"][number]): string {
 /**
  * Apply LSP text edits to a file. Edits are sorted bottom-to-top so earlier
  * positions aren't shifted by later replacements.
+ *
+ * @param filePath - Absolute path to the file being edited.
+ * @param edits - LSP edits to apply.
  */
 async function applyEdits(filePath: string, edits: LspTextEdit[]) {
   const lines = (await readFile(filePath, "utf-8")).split("\n")

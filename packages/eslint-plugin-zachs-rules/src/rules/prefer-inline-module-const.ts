@@ -9,7 +9,12 @@ import {
   visitScopes,
 } from "../shared/scope-variables"
 
-/** Check whether a name uses screaming-snake-case syntax. */
+/**
+ * Check whether a name uses screaming-snake-case syntax.
+ *
+ * @param name - Identifier to inspect.
+ * @returns Whether the name uses screaming-snake-case syntax.
+ */
 function isConstantCase(name: string) {
   return /^[A-Z][A-Z0-9_]*$/u.test(name)
 }

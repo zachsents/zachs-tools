@@ -26,12 +26,25 @@ interface PoolEntry {
 export class TsgoPool {
   private entries = new Map<string, PoolEntry>()
 
+  /**
+   * Create an LSP client pool.
+   *
+   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param idleTimeoutMs - Time before an inactive client is shut down.
+   */
   constructor(
     private binaryPath: string,
     private idleTimeoutMs = DEFAULT_IDLE_TIMEOUT_MS,
   ) {}
 
-  /** Get hover info + definition location in one call */
+  /**
+   * Get hover info + definition location in one call
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @returns Hover text and the first definition location, when available.
+   */
   async hoverWithDefinition(
     filePath: string,
     line: number,
@@ -45,7 +58,12 @@ export class TsgoPool {
     return { hover, definition: definitions[0] ?? null }
   }
 
-  /** Get diagnostics for a file with available fixes for each error */
+  /**
+   * Get diagnostics for a file with available fixes for each error
+   *
+   * @param filePath - Absolute path to the source file.
+   * @returns Diagnostics and the code actions available for them.
+   */
   async diagnosticsWithFixes(
     filePath: string,
   ): Promise<{ diagnostics: LspDiagnostic[]; actions: LspCodeAction[] }> {
@@ -65,7 +83,14 @@ export class TsgoPool {
     }
   }
 
-  /** Find all references to a symbol */
+  /**
+   * Find all references to a symbol
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @returns Locations that reference the selected symbol.
+   */
   async references(
     filePath: string,
     line: number,
@@ -78,12 +103,25 @@ export class TsgoPool {
     )
   }
 
-  /** Get a structured outline of all symbols in a file */
+  /**
+   * Get a structured outline of all symbols in a file
+   *
+   * @param filePath - Absolute path to the source file.
+   * @returns The file's hierarchical symbol outline.
+   */
   async outline(filePath: string): Promise<LspSymbol[]> {
     return (await this.getClient(filePath)).documentSymbols(filePath)
   }
 
-  /** Rename a symbol across the project */
+  /**
+   * Rename a symbol across the project
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @param newName - Replacement symbol name.
+   * @returns Text edits required to perform the rename.
+   */
   async rename(
     filePath: string,
     line: number,
@@ -98,7 +136,14 @@ export class TsgoPool {
     )
   }
 
-  /** Get inferred type annotations for a line range */
+  /**
+   * Get inferred type annotations for a line range
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param startLine - Zero-based inclusive start line.
+   * @param endLine - Zero-based exclusive end line.
+   * @returns Inlay hints reported for the requested range.
+   */
   async inlayHints(
     filePath: string,
     startLine: number,
@@ -122,6 +167,12 @@ export class TsgoPool {
     this.entries.clear()
   }
 
+  /**
+   * Get or create the client for a file's project.
+   *
+   * @param filePath - Absolute path used to locate the project.
+   * @returns A live client for the file's project.
+   */
   private async getClient(filePath: string): Promise<LspClient> {
     const projectRoot = findProjectRoot(filePath)
 
@@ -148,6 +199,12 @@ export class TsgoPool {
     return client
   }
 
+  /**
+   * Schedule an idle client for shutdown.
+   *
+   * @param projectRoot - Absolute path to the client's project root.
+   * @returns The scheduled idle timer.
+   */
   private startIdleTimer(projectRoot: string): Timer {
     return setTimeout(async () => {
       const entry = this.entries.get(projectRoot)
@@ -158,13 +215,24 @@ export class TsgoPool {
     }, this.idleTimeoutMs)
   }
 
+  /**
+   * Restart a client's idle shutdown timer.
+   *
+   * @param projectRoot - Absolute path to the client's project root.
+   * @param entry - Pool entry whose timer should be restarted.
+   */
   private resetIdleTimer(projectRoot: string, entry: PoolEntry): void {
     clearTimeout(entry.idleTimer)
     entry.idleTimer = this.startIdleTimer(projectRoot)
   }
 }
 
-/** Walk up from a file path to find the nearest tsconfig.json */
+/**
+ * Walk up from a file path to find the nearest tsconfig.json
+ *
+ * @param filePath - Absolute path used to start the search.
+ * @returns The nearest project root, or the file's directory as a fallback.
+ */
 function findProjectRoot(filePath: string): string {
   let dir = dirname(filePath)
   for (;;) {

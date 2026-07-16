@@ -11,7 +11,12 @@ export type SourceMappingGroup = {
   mappings: ExactPropertyMapping[]
 }
 
-/** Read a static property name from an object property key. */
+/**
+ * Read a static property name from an object property key.
+ *
+ * @param key - Non-computed object property key.
+ * @returns Its static string name, or null when unavailable.
+ */
 function getStaticPropertyName(
   key: TSESTree.PropertyNameNonComputed,
 ): string | null {
@@ -26,7 +31,12 @@ function getStaticPropertyName(
   return null
 }
 
-/** Read the property name from a non-computed member expression. */
+/**
+ * Read the property name from a non-computed member expression.
+ *
+ * @param member - Member expression to inspect.
+ * @returns Its identifier property name, or null when unsupported.
+ */
 function getIdentifierMemberName(
   member: TSESTree.MemberExpression,
 ): string | null {
@@ -37,7 +47,12 @@ function getIdentifierMemberName(
   return member.property.name
 }
 
-/** Return an expression when it is a direct identifier reference. */
+/**
+ * Return an expression when it is a direct identifier reference.
+ *
+ * @param expression - Expression to inspect.
+ * @returns The expression as an identifier, or null for other forms.
+ */
 function getSourceIdentifier(
   expression: TSESTree.Expression,
 ): TSESTree.Identifier | null {
@@ -48,7 +63,12 @@ function getSourceIdentifier(
   return null
 }
 
-/** Match a property that maps a source member under the same name. */
+/**
+ * Match a property that maps a source member under the same name.
+ *
+ * @param property - Object property to inspect.
+ * @returns Its same-named source mapping, or null when it does not match.
+ */
 function isSameNamedIdentifierMemberMapping(
   property: TSESTree.Property,
 ): { source: TSESTree.Identifier; keyName: string } | null {
@@ -72,7 +92,12 @@ function isSameNamedIdentifierMemberMapping(
   return { source, keyName }
 }
 
-/** Return the identifier used by a spread element. */
+/**
+ * Return the identifier used by a spread element.
+ *
+ * @param property - Spread element to inspect.
+ * @returns Its source identifier, or null for non-identifier arguments.
+ */
 function getSpreadIdentifier(
   property: TSESTree.SpreadElement,
 ): TSESTree.Identifier | null {
@@ -81,7 +106,13 @@ function getSpreadIdentifier(
     : null
 }
 
-/** Group same-named source property mappings that could use a helper. */
+/**
+ * Group same-named source property mappings that could use a helper.
+ *
+ * @param objectExpression - Object literal to analyze.
+ * @param minProperties - Minimum number of mappings required per source.
+ * @returns Eligible same-named mappings grouped by source object.
+ */
 export function findSameNamedSourceMappings(
   objectExpression: TSESTree.ObjectExpression,
   minProperties: number,

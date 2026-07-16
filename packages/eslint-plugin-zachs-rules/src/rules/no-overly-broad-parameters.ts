@@ -17,7 +17,12 @@ type ParameterCandidate = {
   tsNode: ts.ParameterDeclaration
 }
 
-/** Check whether a declaration is exported. */
+/**
+ * Check whether a declaration is exported.
+ *
+ * @param node - Declaration node to inspect.
+ * @returns Whether the declaration is directly exported.
+ */
 function isExported(node: TSESTree.Node): boolean {
   return (
     node.parent?.type === AST_NODE_TYPES.ExportNamedDeclaration ||
@@ -25,7 +30,12 @@ function isExported(node: TSESTree.Node): boolean {
   )
 }
 
-/** Check whether an observed type is useful for narrowing. */
+/**
+ * Check whether an observed type is useful for narrowing.
+ *
+ * @param type - Observed argument type.
+ * @returns Whether the type can support a useful narrowing suggestion.
+ */
 function isUsableObservedType(type: ts.Type): boolean {
   return !(
     type.flags &
@@ -36,7 +46,14 @@ function isUsableObservedType(type: ts.Type): boolean {
   )
 }
 
-/** Check whether a candidate type is strictly narrower than a declared type. */
+/**
+ * Check whether a candidate type is strictly narrower than a declared type.
+ *
+ * @param candidate - Candidate replacement type.
+ * @param declared - Type currently declared on the parameter.
+ * @param checker - TypeScript checker used for assignability tests.
+ * @returns Whether the candidate is safely and strictly narrower.
+ */
 function isStrictlyNarrower(
   candidate: ts.Type,
   declared: ts.Type,
@@ -52,7 +69,13 @@ function isStrictlyNarrower(
   return !checker.isTypeAssignableTo(declared, candidate)
 }
 
-/** Find one widened type that accepts every observed argument type. */
+/**
+ * Find one widened type that accepts every observed argument type.
+ *
+ * @param observedTypes - Argument types collected from direct calls.
+ * @param checker - TypeScript checker used to widen and compare types.
+ * @returns A common observed type, or null when none is suitable.
+ */
 function findCommonObservedType(
   observedTypes: ts.Type[],
   checker: ts.TypeChecker,
@@ -72,7 +95,14 @@ function findCommonObservedType(
   )
 }
 
-/** Resolve the unique TypeScript symbol for a function name. */
+/**
+ * Resolve the unique TypeScript symbol for a function name.
+ *
+ * @param checker - TypeScript checker used to resolve the symbol.
+ * @param node - ESTree identifier for the function name.
+ * @param services - Parser services mapping ESTree to TypeScript nodes.
+ * @returns The unique declaration symbol, or null when resolution is ambiguous.
+ */
 function getFunctionNameSymbol(
   checker: ts.TypeChecker,
   node: TSESTree.Identifier,
@@ -87,7 +117,14 @@ function getFunctionNameSymbol(
   return { declarationName, symbol }
 }
 
-/** Build narrowing candidates from supported function parameters. */
+/**
+ * Build narrowing candidates from supported function parameters.
+ *
+ * @param checker - TypeScript checker used to resolve declared types.
+ * @param estreeParameters - Function parameters from the ESTree tree.
+ * @param tsParameters - Matching parameters from the TypeScript tree.
+ * @returns Supported parameters that can be evaluated for narrowing.
+ */
 function getParameters(
   checker: ts.TypeChecker,
   estreeParameters: TSESTree.Parameter[],
@@ -157,7 +194,13 @@ export default createRule<[], "overlyBroadParameter">({
       symbol: ts.Symbol
     }> = []
 
-    /** Add a locally declared function to the candidate set. */
+    /**
+     * Add a locally declared function to the candidate set.
+     *
+     * @param nameNode - ESTree identifier for the function name.
+     * @param estreeParameters - Function parameters from the ESTree tree.
+     * @param tsParameters - Matching parameters from the TypeScript tree.
+     */
     function addCandidate(
       nameNode: TSESTree.Identifier,
       estreeParameters: TSESTree.Parameter[],
@@ -180,7 +223,12 @@ export default createRule<[], "overlyBroadParameter">({
 
     /** Inspect references and collect argument types for candidate functions. */
     function inspectReferences() {
-      /** Visit TypeScript nodes to associate calls with candidates. */
+      /**
+       * Visit TypeScript nodes to associate calls with candidates.
+       *
+       * @param node - TypeScript node to traverse.
+       * @param bySymbol - Candidate functions indexed by resolved symbol.
+       */
       function visit(
         node: ts.Node,
         bySymbol: Map<ts.Symbol, (typeof candidates)[number]>,
@@ -219,7 +267,12 @@ export default createRule<[], "overlyBroadParameter">({
         ts.forEachChild(node, (child) => visit(child, bySymbol))
       }
 
-      /** Visit source files with one shared candidate index. */
+      /**
+       * Visit source files with one shared candidate index.
+       *
+       * @param files - TypeScript source files to traverse.
+       * @param bySymbol - Candidate functions indexed by resolved symbol.
+       */
       function visitFiles(
         files: ts.SourceFile[],
         bySymbol: Map<ts.Symbol, (typeof candidates)[number]>,

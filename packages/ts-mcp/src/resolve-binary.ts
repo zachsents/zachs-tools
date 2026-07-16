@@ -8,6 +8,9 @@ const PLATFORM_PACKAGE = `@typescript/native-preview-${process.platform}-${proce
  * Resolves the tsgo native binary path. Checks TSGO_PATH env var, then bun/npm
  * global install locations. The native binary is required (not the Node
  * wrapper) for stdio piping.
+ *
+ * @returns The absolute path to the tsgo native binary.
+ * @throws When the configured or installed native binary cannot be found.
  */
 export function resolveTsgoBinary(): string {
   const envPath = process.env.TSGO_PATH

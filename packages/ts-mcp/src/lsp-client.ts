@@ -137,6 +137,13 @@ export class LspClient {
   private documents = new Map<string, DocumentState>()
   private alive = true
 
+  /**
+   * Start a tsgo LSP child process.
+   *
+   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param rootUri - LSP root URI for the project.
+   * @throws When the child process does not expose piped stdio.
+   */
   private constructor(
     binaryPath: string,
     private rootUri: string,
@@ -165,18 +172,32 @@ export class LspClient {
     })
   }
 
-  /** Create and initialize a new LSP client for a project root */
+  /**
+   * Create and initialize a new LSP client for a project root
+   *
+   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param rootUri - LSP root URI for the project.
+   * @returns An initialized LSP client.
+   */
   static async create(binaryPath: string, rootUri: string): Promise<LspClient> {
     const client = new LspClient(binaryPath, rootUri)
     await client.initialize()
     return client
   }
 
+  /** @returns Whether the child process is available for requests. */
   get isAlive() {
     return this.alive
   }
 
-  /** Get hover information at a position in a file */
+  /**
+   * Get hover information at a position in a file
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @returns Rendered hover content, or null when unavailable.
+   */
   async hover(
     filePath: string,
     line: number,
@@ -198,7 +219,14 @@ export class LspClient {
     return formatHoverContents(parsed.data.contents)
   }
 
-  /** Get definition location(s) for a symbol at a position */
+  /**
+   * Get definition location(s) for a symbol at a position
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @returns Definition locations reported for the selected symbol.
+   */
   async definition(
     filePath: string,
     line: number,
@@ -217,7 +245,12 @@ export class LspClient {
     return parseLocations(result)
   }
 
-  /** Pull diagnostics for a file */
+  /**
+   * Pull diagnostics for a file
+   *
+   * @param filePath - Absolute path to the source file.
+   * @returns Diagnostics reported for the file.
+   */
   async diagnostics(filePath: string): Promise<LspDiagnostic[]> {
     if (!this.alive) throw new Error("LSP client is not alive")
 
@@ -247,7 +280,20 @@ export class LspClient {
     }))
   }
 
-  /** Get code actions for a range, optionally scoped to specific diagnostics */
+  /**
+   * Get code actions for a range, optionally scoped to specific diagnostics
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param range - Source range to inspect.
+   * @param range.start - Inclusive start position.
+   * @param range.start.line - Zero-based start line.
+   * @param range.start.character - Zero-based start character.
+   * @param range.end - Exclusive end position.
+   * @param range.end.line - Zero-based end line.
+   * @param range.end.character - Zero-based end character.
+   * @param diagnostics - Diagnostics used to scope available actions.
+   * @returns Code actions returned for the range.
+   */
   async codeActions(
     filePath: string,
     range: {
@@ -315,7 +361,12 @@ export class LspClient {
     return actions
   }
 
-  /** Get a structured outline of all symbols in a file */
+  /**
+   * Get a structured outline of all symbols in a file
+   *
+   * @param filePath - Absolute path to the source file.
+   * @returns The file's hierarchical symbol outline.
+   */
   async documentSymbols(filePath: string): Promise<LspSymbol[]> {
     if (!this.alive) throw new Error("LSP client is not alive")
 
@@ -332,7 +383,15 @@ export class LspClient {
     return buildSymbolTree(result)
   }
 
-  /** Rename a symbol across the project */
+  /**
+   * Rename a symbol across the project
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @param newName - Replacement symbol name.
+   * @returns Text edits required to perform the rename.
+   */
   async rename(
     filePath: string,
     line: number,
@@ -353,7 +412,14 @@ export class LspClient {
     return parseWorkspaceEdit(result)
   }
 
-  /** Get inferred type annotations for a line range */
+  /**
+   * Get inferred type annotations for a line range
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param startLine - Zero-based inclusive start line.
+   * @param endLine - Zero-based exclusive end line.
+   * @returns Inlay hints reported for the requested range.
+   */
   async inlayHints(
     filePath: string,
     startLine: number,
@@ -403,7 +469,14 @@ export class LspClient {
     return hints
   }
 
-  /** Find all references to a symbol at a position */
+  /**
+   * Find all references to a symbol at a position
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param line - Zero-based source line.
+   * @param character - Zero-based character offset.
+   * @returns Locations that reference the selected symbol.
+   */
   async references(
     filePath: string,
     line: number,
@@ -438,6 +511,7 @@ export class LspClient {
     this.proc.kill()
   }
 
+  /** Initialize the LSP session. */
   private async initialize(): Promise<void> {
     await this.sendRequest("initialize", {
       processId: process.pid,
@@ -475,7 +549,12 @@ export class LspClient {
     }
   }
 
-  /** Open a document in the LSP if needed, or update it if contents changed */
+  /**
+   * Open a document in the LSP if needed, or update it if contents changed
+   *
+   * @param filePath - Absolute path to the source file.
+   * @param uri - LSP document URI for the file.
+   */
   private async ensureDocumentOpen(
     filePath: string,
     uri: string,
@@ -508,6 +587,12 @@ export class LspClient {
     }
   }
 
+  /**
+   * Send an LSP request and await its response.
+   *
+   * @param method - LSP method name.
+   * @param params - JSON-RPC request parameters.
+   */
   private sendRequest(method: string, params: unknown): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const id = this.nextId++
@@ -527,14 +612,31 @@ export class LspClient {
     })
   }
 
+  /**
+   * Send an LSP notification.
+   *
+   * @param method - LSP method name.
+   * @param params - JSON-RPC notification parameters.
+   */
   private sendNotification(method: string, params: unknown): void {
     this.send({ jsonrpc: "2.0", method, params })
   }
 
+  /**
+   * Respond to a server-initiated LSP request.
+   *
+   * @param id - Identifier of the server request.
+   * @param result - JSON-RPC response result.
+   */
   private sendResponse(id: number | string, result: unknown): void {
     this.send({ jsonrpc: "2.0", id, result })
   }
 
+  /**
+   * Write a framed JSON-RPC message to the child process.
+   *
+   * @param message - JSON-RPC message to serialize and send.
+   */
   private send(message: object): void {
     const body = JSON.stringify(message)
     this.stdin.write(
@@ -571,6 +673,11 @@ export class LspClient {
     }
   }
 
+  /**
+   * Route a parsed JSON-RPC message.
+   *
+   * @param message - Validated JSON-RPC message from the server.
+   */
   private handleMessage(message: z.infer<typeof jsonRpcMessageSchema>): void {
     // Response to one of our requests (numeric id, no method)
     if (typeof message.id === "number" && !message.method) {
@@ -599,12 +706,22 @@ export class LspClient {
   }
 }
 
-/** Convert a file path to an LSP file URI. */
+/**
+ * Convert a file path to an LSP file URI.
+ *
+ * @param filePath - Absolute path to convert.
+ * @returns The corresponding file URI.
+ */
 function pathToUri(filePath: string): string {
   return `file://${filePath}`
 }
 
-/** Convert an LSP file URI to a file path. */
+/**
+ * Convert an LSP file URI to a file path.
+ *
+ * @param uri - File URI to convert.
+ * @returns The corresponding absolute file path.
+ */
 function uriToPath(uri: string): string {
   return uri.replace(/^file:\/\//, "")
 }
@@ -612,6 +729,9 @@ function uriToPath(uri: string): string {
 /**
  * Parse Location[] or LocationLink[] from an LSP response into LspLocation[].
  * Handles single objects, arrays, and null.
+ *
+ * @param result - Raw LSP definition response.
+ * @returns Normalized definition locations.
  */
 function parseLocations(result: unknown): LspLocation[] {
   if (result == null) return []
@@ -651,6 +771,9 @@ function parseLocations(result: unknown): LspLocation[] {
 /**
  * Build a symbol tree from flat SymbolInformation[]. Uses containerName to
  * reconstruct parent-child relationships.
+ *
+ * @param items - Raw LSP symbol information records.
+ * @returns A hierarchical symbol outline.
  */
 function buildSymbolTree(items: unknown[]): LspSymbol[] {
   const flat: Array<{ symbol: LspSymbol; containerName?: string }> = []
@@ -701,7 +824,12 @@ function buildSymbolTree(items: unknown[]): LspSymbol[] {
   return roots
 }
 
-/** Parse a WorkspaceEdit into flat LspTextEdit[] */
+/**
+ * Parse a WorkspaceEdit into flat LspTextEdit[]
+ *
+ * @param result - Raw LSP workspace edit.
+ * @returns Flattened text edits.
+ */
 function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
   const parsed = z
     .object({
@@ -726,7 +854,12 @@ function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
   return edits
 }
 
-/** Return the LSP language identifier for a source file. */
+/**
+ * Return the LSP language identifier for a source file.
+ *
+ * @param filePath - Source file path.
+ * @returns The matching LSP language identifier.
+ */
 function getLanguageId(filePath: string): string {
   switch (extname(filePath)) {
     case ".ts":
@@ -749,6 +882,9 @@ function getLanguageId(filePath: string): string {
 /**
  * Extract text from LSP hover contents. Handles MarkupContent (`{ value }`),
  * plain strings, and arrays of either.
+ *
+ * @param contents - Raw LSP hover content.
+ * @returns Rendered hover text, or null when the content is unsupported.
  */
 function formatHoverContents(contents: unknown): string | null {
   const str = z.string().safeParse(contents)
