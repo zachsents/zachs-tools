@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/oxlint-config",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "devDependencies": {
@@ -11,9 +11,7 @@
     "@tanstack/eslint-plugin-router": ">=1",
     "@typescript-eslint/parser": "^8.62.0",
     "eslint": "^9.0.0",
-    "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-react-hooks": ">=6",
-    "eslint-plugin-zachs-rules": "^0.2.1",
     "oxlint": ">=1.74.0"
   },
   "exports": {
@@ -66,5 +64,9 @@
     "type": "git",
     "url": "git+https://github.com/zachsents/zachs-tools.git",
     "directory": "packages/oxlint-config"
+  },
+  "dependencies": {
+    "eslint-plugin-jsdoc": "^63.0.13",
+    "eslint-plugin-zachs-rules": "^0.2.1"
   }
 }

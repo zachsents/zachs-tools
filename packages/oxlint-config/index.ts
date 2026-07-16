@@ -9,11 +9,11 @@ export default defineConfig({
   jsPlugins: [
     {
       name: "zachs-rules",
-      specifier: "eslint-plugin-zachs-rules/oxlint",
+      specifier: import.meta.resolve("eslint-plugin-zachs-rules/oxlint"),
     },
     {
       name: "jsdoc-js",
-      specifier: "eslint-plugin-jsdoc",
+      specifier: import.meta.resolve("eslint-plugin-jsdoc"),
     },
   ],
   rules: {
