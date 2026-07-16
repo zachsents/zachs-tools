@@ -31,51 +31,43 @@ After edits, run `bun run check` when it exists. If the project does not have a 
 - Prefer `const` unless mutation is intentional and required.
 - Inline values used once unless it harms readability.
 - Do not hoist magic values into constants unless they are reused or semantically meaningful.
-- Avoid deep nesting. Prefer inlining helper logic unless extraction significantly improves readability.
-- Be wary of variables that exist only due to iterative edits. Re-evaluate which variables actually need to exist and simplify aggressively.
-
-## Declarative Style
-
-- Prefer declarative, expression-based code over imperative mutation. Build objects and arrays in a single expression rather than declaring an empty/partial value and conditionally mutating it.
-  - This is critical for type inference. Declarative construction lets TypeScript infer the full shape automatically, whereas imperative mutation forces vague annotations like `Record<string, unknown>` that destroy downstream type safety.
-  - Use conditional spreads and ternaries for conditional properties.
+- Avoid deep nesting and misdirection. Prefer inlining helper logic unless extraction significantly improves readability.
+- Be wary of ode structure (e.g. variables, helpers, etc.) that exist only due to iterative edits by agents. Re-evaluate which variables actually need to exist to serve the end goal; simplify aggressively.
+- Prefer declarative, expression-based code over imperative mutation.
+  - Generally, this leads to better type-safety through inference. Imperative mutation forces vague annotations like `Record<string, unknown>` that destroy downstream type safety.
+  - Prefer conditional spreads and ternaries for conditional properties.
   - Use `Array.filter`, `.map`, `.flatMap`, etc. over imperative loops with `push`.
-- When vanilla JavaScript lacks the right utility, reach for Remeda (`R`). It provides well-typed functional utilities that keep code declarative without sacrificing type safety.
-- Prefer Remeda's `pipe` over chained native array methods when it fits the surrounding code.
-
-## Concurrency
-
+  - The exception is when an imperative loop may significantly improve performance e.g. looping with a short-circuit condition.
+- When vanilla JavaScript lacks the right utility, reach for Remeda (`R`) or @zachsents/zippy. They provide well-typed functional utilities that keep code declarative without sacrificing type safety.
+- Prefer zippy's `pipe` over chained native array methods when it fits the surrounding code.
 - Use `Promise.all` when possible to speed things up.
-
-## Error Handling
-
-- Use `try/catch` very sparingly.
-- Only use it when meaningful work needs to happen in response to an error.
-- Do not use `try/catch` just to swallow errors or re-log them.
-
-## Documentation & Comments
-
-- Comment only when intent is not obvious from code.
-- Prefer self-explanatory code through naming and structure.
-- Never comment obvious behavior.
+- Use `try/catch` very sparingly
+  - Only use it when meaningful work needs to happen in response to an error.
+  - Do not use `try/catch` just to swallow errors or re-log them.
+- Prefer self-explanatory code through naming and structure, but comment when intent isn't immediately obvious.
+  - This rule may be in conflict with the expectation to inline one-off helpers; prefer inlining + commenting over unnecessary abstraction.
+  - Never comment obvious behavior.
 - If you break any coding rule, leave a comment with `REVIEW: [reason]`.
-- Document function declarations unless painfully simple or obvious. Don't use JSDoc tags; use simple descriptions.
-- For inline comments describing what a line does, use `//`. For documenting a variable or function, use `/** */`.
+- Avoid unnecessary spreads. Confirm the spread is actually needed to create a new reference.
+- Avoid manually re-listing all object properties. Prefer object spread, or `R.pick` / `R.omit`.
+- Avoid overly defensive coding for scenarios that would never happen.
+- Avoid jumping into implementing long-winded workarounds or hacks. If what the user asks for isn't directly feasible, stop, explain, and come ready to brainstorm instead.
+- For conditionals, use the simplest check that is correct e.g. `if(someVar)` is fine over `if(Boolean(someVar))`
+- Avoid strict `===` / `!==` for nullish checks unless the distinction between `null` and `undefined` matters.
 
 ## Git
 
 - Never perform Git writes unless explicitly instructed.
 - If asked to commit, keep commit messages short.
 
-## Concurrent Changes
+## Co-working
 
-- If files change unexpectedly, assume the change came from the user or another agent.
-- Do not revert or overwrite unexpected changes unless the user explicitly asks.
-- Inspect the change, preserve it, and work with it. Ask only if the change makes the task impossible to complete safely.
+- If files change unexpectedly, assume the change came from the user or another agent. There are often multiple users/agents working in the same tree.
+- If the change is in direct conflict with what you're doing, stop and explain to the user.
 
 ## Dependencies
 
-- Always add dependencies using `bun add`.
+- Always add dependencies using `bun add` to get the latest version.
 - Do not manually edit `package.json` to add versions; let Bun resolve the version automatically.
 - After adding a workspace dependency, always run `bun install` so the workspace links correctly.
 
@@ -84,15 +76,3 @@ After edits, run `bun run check` when it exists. If the project does not have a 
 - Prefer using official CLI tools or generators over manually creating or editing config files.
 - Use `@zachsents/prettier-config` instead of recreating the shared Prettier settings.
 - Extend `@zachsents/oxlint-config` for oxlint configuration. React projects should also use `@zachsents/oxlint-config/react`.
-
-## Object & Value Handling
-
-- Avoid unnecessary spreads. Confirm the spread is actually needed to create a new reference.
-- Avoid manually re-listing all object properties. Prefer object spread, or `R.pick` / `R.omit`.
-- Avoid unnecessary defaults, coalescing, optional chaining, or conditions.
-
-## Conditionals
-
-- Use the simplest check that is correct.
-- Prefer truthy/falsy checks when appropriate.
-- Avoid strict `===` / `!==` for nullish checks unless the distinction between `null` and `undefined` matters.
