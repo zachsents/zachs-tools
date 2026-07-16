@@ -36,7 +36,7 @@
     "fix": "bun run lint:fix && bun run format",
     "test": "bun test/smoke.ts",
     "typecheck": "tsc --noEmit",
-    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
+    "check": "bun run --cwd ../.. build:lint-plugin && bun run format:check && bun run lint && bun run typecheck && bun run test",
     "prepublishOnly": "bun run check && bun run build"
   },
   "devDependencies": {

@@ -8,8 +8,9 @@
   ],
   "scripts": {
     "agent-rules:sync": "bun plugins/zach-codex/scripts/sync-agent-rules.ts",
-    "build": "bun run --cwd packages/oxlint-config build && bun run --cwd packages/ts-mcp build && bun run --cwd packages/eslint-plugin-zachs-rules build",
-    "check": "bun run agent-rules:sync && bun run format:check && bun run lint:eslint && bun run --cwd packages/oxlint-config check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
+    "build": "bun run build:lint-plugin && bun run --cwd packages/oxlint-config build && bun run --cwd packages/ts-mcp build",
+    "build:lint-plugin": "bun run --cwd packages/eslint-plugin-zachs-rules build",
+    "check": "bun run agent-rules:sync && bun run build:lint-plugin && bun run format:check && bun run lint:eslint && bun run --cwd packages/oxlint-config check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "bun run lint:oxlint && bun run lint:eslint",

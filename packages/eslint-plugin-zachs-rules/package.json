@@ -63,7 +63,7 @@
     "format:check": "prettier . --check",
     "test": "bun test",
     "build": "zshy",
-    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run build",
+    "check": "bun run build && bun run format:check && bun run lint && bun run typecheck && bun run test",
     "prepublishOnly": "bun run check"
   },
   "files": [

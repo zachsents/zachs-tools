@@ -49,7 +49,7 @@
   "scripts": {
     "typecheck": "command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit",
     "build": "zshy",
-    "check": "bun run typecheck && bun run build",
+    "check": "bun run --cwd ../.. build:lint-plugin && bun run typecheck && bun run build",
     "prepublishOnly": "bun run check"
   },
   "type": "module",
