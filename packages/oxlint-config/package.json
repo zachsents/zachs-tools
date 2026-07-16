@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/oxlint-config",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "devDependencies": {
@@ -13,7 +13,7 @@
     "eslint": "^9.0.0",
     "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-react-hooks": ">=6",
-    "eslint-plugin-zachs-rules": "workspace:*",
+    "eslint-plugin-zachs-rules": "^0.2.1",
     "oxlint": ">=1.74.0"
   },
   "exports": {
