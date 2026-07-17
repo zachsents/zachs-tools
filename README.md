@@ -51,3 +51,12 @@ Copy or link `packages/agent-rules/AGENTS.md` into projects that should share th
 bun install
 bun run check
 ```
+
+Bump a publishable workspace package without creating a Git commit or tag:
+
+```sh
+bun run version:bump oxlint-config patch
+```
+
+The command accepts a workspace package name, directory name, or path and keeps
+the package manifest and `bun.lock` workspace version synchronized.

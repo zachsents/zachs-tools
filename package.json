@@ -10,15 +10,17 @@
     "agent-rules:sync": "bun plugins/zach-codex/scripts/sync-agent-rules.ts",
     "build": "bun run build:lint-plugin && bun run --cwd packages/oxlint-config build && bun run --cwd packages/ts-mcp build",
     "build:lint-plugin": "bun run --cwd packages/eslint-plugin-zachs-rules build",
-    "check": "bun run agent-rules:sync && bun run build:lint-plugin && bun run format:check && bun run lint:eslint && bun run --cwd packages/oxlint-config check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
+    "check": "bun run agent-rules:sync && bun run build:lint-plugin && bun run format:check && bun run lint:eslint && bun run typecheck:scripts && bun run --cwd packages/oxlint-config check && bun run --cwd packages/ts-mcp check && bun run --cwd packages/eslint-plugin-zachs-rules check",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "bun run lint:oxlint && bun run lint:eslint",
     "lint:eslint": "eslint .",
     "lint:fix": "bun run --cwd packages/ts-mcp lint:fix && bun run --cwd packages/eslint-plugin-zachs-rules lint:fix && eslint . --fix",
     "lint:oxlint": "bun run --cwd packages/ts-mcp lint && bun run --cwd packages/eslint-plugin-zachs-rules lint",
-    "typecheck": "bun run --cwd packages/ts-mcp typecheck && bun run --cwd packages/eslint-plugin-zachs-rules typecheck",
-    "test": "bun run --cwd packages/ts-mcp test && bun run --cwd packages/eslint-plugin-zachs-rules test"
+    "typecheck": "bun run typecheck:scripts && bun run --cwd packages/ts-mcp typecheck && bun run --cwd packages/eslint-plugin-zachs-rules typecheck",
+    "typecheck:scripts": "command -v tsgo >/dev/null && tsgo --noEmit -p scripts/tsconfig.json || tsc --noEmit -p scripts/tsconfig.json",
+    "test": "bun run --cwd packages/ts-mcp test && bun run --cwd packages/eslint-plugin-zachs-rules test",
+    "version:bump": "bun scripts/bump-workspace-version.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
