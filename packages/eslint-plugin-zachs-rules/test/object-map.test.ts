@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
-import { ESLint } from "eslint"
+import { ESLint, type Linter } from "eslint"
 import parser from "@typescript-eslint/parser"
 import plugin from "../src/index"
 
@@ -210,5 +210,71 @@ test("can configure the maximum use threshold", async () => {
   ).toEqual([
     "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
     "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+  ])
+})
+
+test("can ignore sole runtime reads inside nested functions", async () => {
+  const source = `
+    declare function use(value: string): string
+
+    function sameFunction(value: string, condition: boolean) {
+      const sameFunctionValue = value.trim()
+      if (condition) {
+        return sameFunctionValue
+      }
+      return ""
+    }
+
+    function arrowClosure(value: string) {
+      const arrowClosureValue = value.trim()
+      return () => use(arrowClosureValue)
+    }
+
+    function nestedFunction(value: string) {
+      const nestedFunctionValue = value.trim()
+      function readValue() {
+        return use(nestedFunctionValue)
+      }
+      return readValue
+    }
+  `
+  const lint = (source: string, rule: Linter.RuleEntry) =>
+    new ESLint({
+      cwd: root,
+      overrideConfigFile: true,
+      overrideConfig: [
+        {
+          files: ["**/*.ts"],
+          languageOptions: { parser },
+          plugins: {
+            "zachs-rules": ESLINT_PLUGIN,
+          },
+          rules: {
+            "zachs-rules/prefer-inline-single-use-local-const": rule,
+          },
+        },
+      ],
+    }).lintText(source, { filePath: "nested-functions.ts" })
+
+  const [defaultResults, ignoredResults] = await Promise.all([
+    lint(source, "error"),
+    lint(source, ["error", { ignoreNestedFunctionReads: true }]),
+  ])
+
+  expect(
+    defaultResults.flatMap((result) =>
+      result.messages.map((message) => message.message).toSorted(),
+    ),
+  ).toEqual([
+    "`arrowClosureValue` is a local const used only once. Consider inlining it.",
+    "`nestedFunctionValue` is a local const used only once. Consider inlining it.",
+    "`sameFunctionValue` is a local const used only once. Consider inlining it.",
+  ])
+  expect(
+    ignoredResults.flatMap((result) =>
+      result.messages.map((message) => message.message).toSorted(),
+    ),
+  ).toEqual([
+    "`sameFunctionValue` is a local const used only once. Consider inlining it.",
   ])
 })

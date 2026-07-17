@@ -95,24 +95,23 @@ export function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
 }
 
 /**
- * Count runtime reads, excluding value references made only through a type
- * query.
+ * Get runtime reads, excluding value references made only through a type query.
  *
- * @param variable - Scope variable whose references should be counted.
+ * @param variable - Scope variable whose references should be collected.
  * @param sourceCode - Parsed source used to inspect reference ancestors.
- * @returns The number of runtime read references.
+ * @returns The runtime read references.
  */
-export function countRuntimeReads(
+export function getRuntimeReadReferences(
   variable: TSESLint.Scope.Variable,
   sourceCode: TSESLint.SourceCode,
-) {
+): TSESLint.Scope.Reference[] {
   return variable.references.filter(
     (reference) =>
       reference.isRead() &&
       !sourceCode
         .getAncestors(reference.identifier)
         .some((ancestor) => ancestor.type === AST_NODE_TYPES.TSTypeQuery),
-  ).length
+  )
 }
 
 /**

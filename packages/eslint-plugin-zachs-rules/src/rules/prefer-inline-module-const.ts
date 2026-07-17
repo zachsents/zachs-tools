@@ -1,7 +1,7 @@
 import { createRule } from "../shared/create-rule"
 import {
-  countRuntimeReads,
   getConstDefinition,
+  getRuntimeReadReferences,
   hasDocumentationComment,
   hasNonInitializerWrite,
   isExported,
@@ -67,10 +67,10 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
               continue
             }
 
-            const runtimeReadCount = countRuntimeReads(
+            const runtimeReadCount = getRuntimeReadReferences(
               variable,
               context.sourceCode,
-            )
+            ).length
 
             if (
               runtimeReadCount < 1 ||
