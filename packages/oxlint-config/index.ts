@@ -25,12 +25,19 @@ export default defineConfig({
     "jsdoc-js/require-jsdoc": [
       "error",
       {
+        contexts: [
+          "TSDeclareFunction",
+          'MethodDefinition[value.type="TSEmptyBodyFunctionExpression"]',
+          'MethodDefinition[value.type!="TSEmptyBodyFunctionExpression"]:not(MethodDefinition[value.type="TSEmptyBodyFunctionExpression"] + MethodDefinition)',
+        ],
         enableFixer: false,
+        exemptOverloadedImplementations: true,
         require: {
           ClassDeclaration: true,
           FunctionDeclaration: true,
-          MethodDefinition: true,
+          MethodDefinition: false,
         },
+        skipInterveningOverloadedDeclarations: false,
       },
     ],
     "jsdoc-js/require-param": ["error", { enableFixer: false }],

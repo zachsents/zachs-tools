@@ -47,7 +47,7 @@
     },
     "packages/oxlint-config": {
       "name": "@zachsents/oxlint-config",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "dependencies": {
         "eslint-plugin-jsdoc": "^63.0.13",
         "eslint-plugin-zachs-rules": "^0.2.1",
