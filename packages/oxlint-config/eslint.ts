@@ -3,9 +3,6 @@ import parser from "@typescript-eslint/parser"
 import { defineConfig } from "eslint/config"
 import zachsRules from "eslint-plugin-zachs-rules"
 
-// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
-const eslintPlugin = zachsRules as unknown as ESLint.Plugin
-
 export default defineConfig([
   {
     name: "zachs-rules/base",
@@ -17,7 +14,8 @@ export default defineConfig([
       },
     },
     plugins: {
-      "zachs-rules": eslintPlugin,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
+      "zachs-rules": zachsRules as unknown as ESLint.Plugin,
     },
     rules: {
       "lines-around-comment": [

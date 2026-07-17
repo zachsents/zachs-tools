@@ -8,10 +8,7 @@
     "zshy": "^0.7.3"
   },
   "peerDependencies": {
-    "@tanstack/eslint-plugin-router": ">=1",
-    "@typescript-eslint/parser": "^8.62.0",
     "eslint": "^9.0.0",
-    "eslint-plugin-react-hooks": ">=6",
     "oxlint": ">=1.74.0"
   },
   "exports": {
@@ -33,14 +30,6 @@
     "dist"
   ],
   "license": "MIT",
-  "peerDependenciesMeta": {
-    "@tanstack/eslint-plugin-router": {
-      "optional": true
-    },
-    "eslint-plugin-react-hooks": {
-      "optional": true
-    }
-  },
   "publishConfig": {
     "access": "public"
   },
@@ -66,7 +55,10 @@
     "directory": "packages/oxlint-config"
   },
   "dependencies": {
+    "@tanstack/eslint-plugin-router": "^1.162.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "eslint-plugin-jsdoc": "^63.0.13",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-zachs-rules": "^0.2.1"
   }
 }
