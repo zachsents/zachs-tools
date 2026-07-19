@@ -19,7 +19,7 @@
     },
     "packages/agent-rules": {
       "name": "@zachsents/agent-rules",
-      "version": "0.1.0",
+      "version": "0.1.1",
     },
     "packages/eslint-plugin-zachs-rules": {
       "name": "eslint-plugin-zachs-rules",
