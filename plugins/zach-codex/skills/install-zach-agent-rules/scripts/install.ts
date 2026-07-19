@@ -1,14 +1,6 @@
 import { mkdir } from "node:fs/promises"
 import { basename, resolve } from "node:path"
 
-const ruleFiles = [
-  "general.md",
-  "typescript.md",
-  "react.md",
-  "convex.md",
-  "tech-stack.md",
-  "mcp-preferences.md",
-]
 const startMarker = "<!-- zach-agent-rules:start -->"
 const endMarker = "<!-- zach-agent-rules:end -->"
 const args = process.argv.slice(2)
@@ -28,6 +20,11 @@ const sourceRoot = resolve(
 )
 const destinationRoot = resolve(targetRoot, ".agents/zach-rules")
 const rootAgentsPath = resolve(targetRoot, "AGENTS.md")
+const ruleFiles = (
+  await Array.fromAsync(
+    new Bun.Glob("*.md").scan({ cwd: sourceRoot, onlyFiles: true }),
+  )
+).sort()
 const managedBlock = `${startMarker}
 # Zach Agent Rules
 
@@ -60,14 +57,7 @@ const sourceEntries = await Promise.all(
 )
 const rulesIndex = `# Zach Agent Rules
 
-Before editing code, read and follow these rule files:
-
-- \`general.md\`
-- \`typescript.md\` for TypeScript or JavaScript work
-- \`react.md\` for React work
-- \`convex.md\` for Convex work
-- \`tech-stack.md\` when choosing defaults for new project work
-- \`mcp-preferences.md\` when external tools or systems are involved
+Before editing or reviewing code, read the general rulebook. Apply each technology- or system-specific rulebook when its subject is in scope.
 
 Repository-specific and nested \`AGENTS.md\` instructions take precedence when they are more specific.
 `

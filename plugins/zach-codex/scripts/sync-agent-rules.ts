@@ -1,12 +1,5 @@
 import { resolve } from "node:path"
 
-const ruleFiles = [
-  "general.md",
-  "typescript.md",
-  "react.md",
-  "convex.md",
-  "tech-stack.md",
-]
 const checkOnly = process.argv.includes("--check")
 const repositoryRoot = resolve(import.meta.dir, "../../..")
 const sourceRoot = resolve(repositoryRoot, "packages/agent-rules/rules")
@@ -14,6 +7,11 @@ const destinationRoot = resolve(
   repositoryRoot,
   "plugins/zach-codex/skills/follow-zach-coding-standards/references",
 )
+const ruleFiles = (
+  await Array.fromAsync(
+    new Bun.Glob("*.md").scan({ cwd: sourceRoot, onlyFiles: true }),
+  )
+).sort()
 const entries = await Promise.all(
   ruleFiles.map(async (name) => ({
     name,

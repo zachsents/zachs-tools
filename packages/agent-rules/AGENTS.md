@@ -3,9 +3,7 @@
 Before editing code, read and follow these rule files:
 
 - `rules/general.md`
-- `rules/typescript.md`
 - `rules/react.md` when working in React projects
 - `rules/convex.md` when working in Convex projects
-- `rules/tech-stack.md` when choosing defaults for new project work
 
 These files are the source of truth for reusable agent guidance.

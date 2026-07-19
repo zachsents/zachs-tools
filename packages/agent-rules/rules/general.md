@@ -1,78 +1,117 @@
 # General Coding Rules
 
-## Runtime
+## Workflow
 
-- Only ever use Bun as the package manager and runtime. This includes running scripts e.g. `bunx shadcn@latest add menu`
+- Use Bun as the package manager and runtime, including scripts and CLIs such as `bunx shadcn@latest add menu`.
+- Research current documentation before using a library; do not rely on remembered APIs.
+- If the project has an oxlint config, run `oxlint --rules` before writing code and follow the active rules.
+- Never start a dev server unless the user asks. If one is required and not running, stop and ask.
+- Avoid long workarounds or hacks. If a request is not directly feasible, explain the constraint and offer alternatives.
 
-## Research
+## Stack Defaults
 
-- When using a library, always research the latest docs. Your knowledge is often out of date.
+Use these unless the user or repository specifies otherwise:
 
-## Session Start
+- **Runtime and package management:** Bun
+- **Full-stack React:** Vite + TanStack Start
+- **TanStack libraries:** Router, Query, Form, Table, Virtual, Pacer
+- **Backend:** Convex
+- **Linting:** oxlint in type-aware mode with `@zachsents/oxlint-config`; add `@zachsents/oxlint-config/react` for React
+- **Formatting:** Prettier with `@zachsents/prettier-config`
+- **Type checking:** tsgo, falling back to tsc
+- **Styling:** TailwindCSS v4
+- **Components:** shadcn/ui with Base UI
+- **Authentication:** Better Auth
+- **Utilities:** Remeda, `@zachsents/zippy`, Zod v4, date-fns
 
-- If the project has an oxlint config, run `oxlint --rules` before writing code. Internalize the active rules and avoid code that violates them.
-- Never start dev servers on your own. The user is usually running one. If they're not and you need one, stop and ask.
+## Code Style
+
+- Use function declarations for top-level and exported functions; use arrows for callbacks and closures.
+- Prefer `const`; mutate only when required.
+- Inline single-use values and helpers unless it harms readability. Hoist only reused or semantically meaningful values.
+- Remove code structure left over from iterative edits. Avoid deep nesting, misdirection, and defensive handling for impossible cases.
+- Prefer declarative, expression-based code over imperative mutation for stronger type inference.
+  - Build objects and arrays in one expression with conditional spreads and ternaries.
+  - Prefer `filter`, `map`, and `flatMap` over loops with `push`, except when a loop materially improves performance, such as short-circuiting.
+- Use Remeda (`R`) or `@zachsents/zippy` when JavaScript lacks a well-typed utility. Prefer zippy's `pipe` over chained array methods when it fits.
+- Use `Promise.all` for independent async work.
+- Use `try/catch` only for meaningful recovery; never swallow or merely re-log errors.
+- Prefer self-explanatory code. Comment non-obvious intent, never obvious behavior. Prefer an inline comment over extracting a one-use helper only to explain it.
+- Mark intentional rule exceptions with `REVIEW: [reason]`.
+- Avoid unnecessary spreads and manual property re-listing. Prefer object spread, `R.pick`, or `R.omit`.
+- Use the simplest correct condition. Prefer truthy checks where appropriate; distinguish `null` from `undefined` only when needed.
+
+## TypeScript
+
+- Use `ts-mcp` throughout implementation: inspect inferred types with hover and inlay hints, find references before changing shared symbols, and check diagnostics after meaningful edits.
+- Prefer inference; add explicit annotations only when they improve readability.
+- Use `unknown` for genuinely unknown values.
+- Avoid casts unless required. Never use `as unknown as`.
+- Import or derive existing types instead of redefining them.
+- Validate untrusted values with Zod and infer their types from the schema.
+- Do not create `.d.ts` files to declare modules.
+- Make types specific as early in the type graph as possible.
+- Use `any` only with `infer` or as an intentionally ignored generic parameter.
+
+## Dependencies and Scaffolding
+
+- Add dependencies with `bun add` or update them with `bun update <package> --latest`; let Bun resolve versions.
+- After adding a workspace dependency, run `bun install` to create the workspace link.
+- Prefer official CLIs and generators over manual scaffolding.
 
 ## Check Pipeline
 
-Prefer projects to expose these scripts:
+Every package, whether standalone or in a workspace, should expose:
 
 - `typecheck`: `command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit`
-- `lint`: `oxlint --type-aware --fix --fix-suggestions`
+- `lint`: `oxlint --type-aware`
+- `lint:fix`: `oxlint --type-aware --fix-suggestions`
+- `check`: `bun run typecheck && bun run lint`
+
+Standalone packages should also expose:
+
 - `format`: `prettier . --write`
-- `fix`: `bun run lint && bun run format`
-- `check`: `bun run typecheck && bun run fix`
+- `fix`: `bun run typecheck && bun run lint:fix && bun run format`
 
-After edits, run `bun run check` when it exists. If the project does not have a `check` script, run the smallest relevant typecheck, lint, and test commands.
+Monorepo roots should use Turborepo and expose:
 
-## Style
+- `typecheck`: `turbo run typecheck`
+- `format`: `prettier . --write`
+- `lint`: `turbo run lint`
+- `lint:fix`: `turbo run lint:fix`
+- `check`: `turbo run check`
+- `fix`: `bun run typecheck && bun run lint:fix && bun run format`
 
-- Use `function` declarations for top-level and exported functions. Use arrow functions for inline callbacks and closures.
-- Prefer `const` unless mutation is intentional and required.
-- Inline values used once unless it harms readability.
-- Do not hoist magic values into constants unless they are reused or semantically meaningful.
-- Avoid deep nesting and misdirection. Prefer inlining helper logic unless extraction significantly improves readability.
-- Be wary of ode structure (e.g. variables, helpers, etc.) that exist only due to iterative edits by agents. Re-evaluate which variables actually need to exist to serve the end goal; simplify aggressively.
-- Prefer declarative, expression-based code over imperative mutation.
-  - Generally, this leads to better type-safety through inference. Imperative mutation forces vague annotations like `Record<string, unknown>` that destroy downstream type safety.
-  - Prefer conditional spreads and ternaries for conditional properties.
-  - Use `Array.filter`, `.map`, `.flatMap`, etc. over imperative loops with `push`.
-  - The exception is when an imperative loop may significantly improve performance e.g. looping with a short-circuit condition.
-- When vanilla JavaScript lacks the right utility, reach for Remeda (`R`) or @zachsents/zippy. They provide well-typed functional utilities that keep code declarative without sacrificing type safety.
-- Prefer zippy's `pipe` over chained native array methods when it fits the surrounding code.
-- Use `Promise.all` when possible to speed things up.
-- Use `try/catch` very sparingly
-  - Only use it when meaningful work needs to happen in response to an error.
-  - Do not use `try/catch` just to swallow errors or re-log them.
-- Prefer self-explanatory code through naming and structure, but comment when intent isn't immediately obvious.
-  - This rule may be in conflict with the expectation to inline one-off helpers; prefer inlining + commenting over unnecessary abstraction.
-  - Never comment obvious behavior.
-- If you break any coding rule, leave a comment with `REVIEW: [reason]`.
-- Avoid unnecessary spreads. Confirm the spread is actually needed to create a new reference.
-- Avoid manually re-listing all object properties. Prefer object spread, or `R.pick` / `R.omit`.
-- Avoid overly defensive coding for scenarios that would never happen.
-- Avoid jumping into implementing long-winded workarounds or hacks. If what the user asks for isn't directly feasible, stop, explain, and come ready to brainstorm instead.
-- For conditionals, use the simplest check that is correct e.g. `if(someVar)` is fine over `if(Boolean(someVar))`
-- Avoid strict `===` / `!==` for nullish checks unless the distinction between `null` and `undefined` matters.
+Keep formatting at the monorepo root so one Prettier invocation covers the repository. Use this `turbo.json` structure:
 
-## Git
+```json
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "tasks": {
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "lint:fix": {
+      "cache": false,
+      "outputs": []
+    },
+    "check": {
+      "dependsOn": ["^check"],
+      "outputs": []
+    }
+  }
+}
+```
 
-- Never perform Git writes unless explicitly instructed.
-- If asked to commit, keep commit messages short.
+Keep `lint:fix` uncached because it writes to the working tree. Add task outputs or inputs only when needed.
 
-## Co-working
+After edits, run `bun run fix` when available. Use `fix` for development and agent work; use non-writing `check` for CI and validation-only contexts. Without `fix`, run the smallest relevant typecheck, lint-fix, and formatting commands.
 
-- If files change unexpectedly, assume the change came from the user or another agent. There are often multiple users/agents working in the same tree.
-- If the change is in direct conflict with what you're doing, stop and explain to the user.
+## Git and Co-working
 
-## Dependencies
-
-- Always add dependencies using `bun add` to get the latest version.
-- Do not manually edit `package.json` to add versions; let Bun resolve the version automatically.
-- After adding a workspace dependency, always run `bun install` so the workspace links correctly.
-
-## Tooling & Scaffolding
-
-- Prefer using official CLI tools or generators over manually creating or editing config files.
-- Use `@zachsents/prettier-config` instead of recreating the shared Prettier settings.
-- Extend `@zachsents/oxlint-config` for oxlint configuration. React projects should also use `@zachsents/oxlint-config/react`.
+- Never perform Git writes unless explicitly instructed. If asked to commit, use a short message.
+- Treat unexpected file changes as concurrent user or agent work. If they conflict with the task, stop and explain.
