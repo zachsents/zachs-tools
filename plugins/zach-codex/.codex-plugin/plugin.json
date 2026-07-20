@@ -1,6 +1,6 @@
 {
   "name": "zach-codex",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Zach's reusable coding standards and preferred MCP integrations for Codex.",
   "author": {
     "name": "Zach Sents",
@@ -21,9 +21,6 @@
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Read", "Write"],
     "websiteURL": "https://github.com/zachsents/zachs-tools",
-    "defaultPrompt": [
-      "Apply my coding standards to this change.",
-      "Install my agent rules in this repository."
-    ]
+    "defaultPrompt": ["Apply my coding standards to this change."]
   }
 }

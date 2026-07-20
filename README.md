@@ -12,6 +12,19 @@ Personal tooling monorepo for agent type-awareness, lint rules, shared formatter
 
 ## Usage
 
+### Agent guidance
+
+The Zach Codex plugin's `$follow-zach-coding-standards` skill applies the shared
+rules automatically when coding work matches its description. It may work
+without an explicit instruction, but naming the skill makes activation more
+reliable.
+
+Add this line to a project's root `AGENTS.md`:
+
+```md
+Use the installed `$follow-zach-coding-standards` skill for all implementation, debugging, and code-review work. Repository-specific instructions take precedence when more specific.
+```
+
 Use the Prettier config from `package.json`:
 
 ```json
@@ -42,8 +55,6 @@ export default defineConfig({
   extends: [baseConfig, reactConfig],
 })
 ```
-
-Copy or link `packages/agent-rules/AGENTS.md` into projects that should share the agent guidance.
 
 ## Development
 
