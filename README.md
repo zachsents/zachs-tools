@@ -19,6 +19,10 @@ rules automatically when coding work matches its description. It may work
 without an explicit instruction, but naming the skill makes activation more
 reliable.
 
+Use `$update-zachs-tools` in a consumer repository to update its installed
+zachs-tools packages, refresh the global Zach Codex plugin, review published
+package diffs, and migrate configs or agent guidance affected by the releases.
+
 Add this line to a project's root `AGENTS.md`:
 
 ```md

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Zach’s Tools"
+  short_description: "Upgrade Zach’s packages, plugin, configs, and rules"
+  default_prompt: "Use $update-zachs-tools to update this project and my global Zach Codex plugin."
