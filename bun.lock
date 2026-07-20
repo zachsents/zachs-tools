@@ -49,13 +49,13 @@
     },
     "packages/oxlint-config": {
       "name": "@zachsents/oxlint-config",
-      "version": "0.2.8",
+      "version": "0.2.9",
       "dependencies": {
         "@tanstack/eslint-plugin-router": "^1.162.0",
         "@typescript-eslint/parser": "^8.64.0",
         "eslint-plugin-jsdoc": "^63.0.13",
         "eslint-plugin-react-hooks": "^7.1.1",
-        "eslint-plugin-zachs-rules": "^0.2.1",
+        "eslint-plugin-zachs-rules": "0.2.3",
       },
       "devDependencies": {
         "@typescript/native": "npm:typescript@^7.0.2",
