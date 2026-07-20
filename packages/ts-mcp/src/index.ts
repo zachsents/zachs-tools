@@ -4,10 +4,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod"
 import type { LspCodeAction, LspSymbol, LspTextEdit } from "./lsp-client.ts"
-import { TsgoPool } from "./pool.ts"
-import { resolveTsgoBinary } from "./resolve-binary.ts"
+import { TypeScriptPool } from "./pool.ts"
+import { resolveTscBinary } from "./resolve-binary.ts"
 
-const pool = new TsgoPool(resolveTsgoBinary())
+const pool = new TypeScriptPool(resolveTscBinary())
 
 const server = new McpServer({
   name: "ts-hover",

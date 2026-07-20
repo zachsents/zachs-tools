@@ -264,7 +264,7 @@ export default createRule<[], "overlyBroadParameter">({
           }
         }
 
-        ts.forEachChild(node, (child) => visit(child, bySymbol))
+        ts.forEachChild(node, (child: ts.Node) => visit(child, bySymbol))
       }
 
       /**
@@ -285,7 +285,7 @@ export default createRule<[], "overlyBroadParameter">({
           ? [sourceFile]
           : services.program
               .getSourceFiles()
-              .filter((file) => !file.isDeclarationFile),
+              .filter((file: ts.SourceFile) => !file.isDeclarationFile),
         new Map(candidates.map((candidate) => [candidate.symbol, candidate])),
       )
     }

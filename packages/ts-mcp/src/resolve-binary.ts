@@ -1,50 +1,43 @@
 import { existsSync } from "node:fs"
-import { homedir } from "node:os"
-import { join } from "node:path"
+import { createRequire } from "node:module"
+import { dirname, join } from "node:path"
 
-const PLATFORM_PACKAGE = `@typescript/native-preview-${process.platform}-${process.arch}`
+const PLATFORM_PACKAGE = `@typescript/typescript-${process.platform}-${process.arch}`
 
 /**
- * Resolves the tsgo native binary path. Checks TSGO_PATH env var, then bun/npm
- * global install locations. The native binary is required (not the Node
- * wrapper) for stdio piping.
+ * Resolves the TypeScript 7 native compiler installed for the current platform.
+ * The native binary is required (not the Node wrapper) for stdio piping.
  *
- * @returns The absolute path to the tsgo native binary.
+ * @returns The absolute path to the native tsc binary.
  * @throws When the configured or installed native binary cannot be found.
  */
-export function resolveTsgoBinary(): string {
-  const envPath = process.env.TSGO_PATH
+export function resolveTscBinary(): string {
+  const envPath = process.env.TSC_PATH
   if (envPath) {
     if (!existsSync(envPath))
       throw new Error(
-        `TSGO_PATH is set to "${envPath}" but the file does not exist`,
+        `TSC_PATH is set to "${envPath}" but the file does not exist`,
       )
     return envPath
   }
 
-  const exe = process.platform === "win32" ? "tsgo.exe" : "tsgo"
-  for (const candidate of [
-    join(
-      homedir(),
-      ".bun",
-      "install",
-      "global",
-      "node_modules",
-      PLATFORM_PACKAGE,
-      "lib",
-      exe,
+  const binaryPath = join(
+    dirname(
+      createRequire(
+        createRequire(import.meta.url).resolve("typescript/package.json"),
+      ).resolve(`${PLATFORM_PACKAGE}/package.json`),
     ),
-    join("/usr", "local", "lib", "node_modules", PLATFORM_PACKAGE, "lib", exe),
-  ]) {
-    if (existsSync(candidate)) return candidate
-  }
+    "lib",
+    process.platform === "win32" ? "tsc.exe" : "tsc",
+  )
+  if (existsSync(binaryPath)) return binaryPath
 
   throw new Error(
     [
-      "Could not find tsgo native binary.",
+      "Could not find the TypeScript 7 native compiler.",
       `Looked for package: ${PLATFORM_PACKAGE}`,
-      "Install globally: bun add -g @typescript/native-preview",
-      "Or set TSGO_PATH to the native binary path.",
+      `Expected binary: ${binaryPath}`,
+      "Reinstall @zachsents/ts-mcp, or set TSC_PATH to the native binary path.",
     ].join("\n"),
   )
 }

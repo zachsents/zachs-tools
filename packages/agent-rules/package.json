@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/agent-rules",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Reusable AGENTS.md guidance for Zach's projects.",
   "repository": {
     "type": "git",

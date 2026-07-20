@@ -18,7 +18,7 @@ Use these unless the user or repository specifies otherwise:
 - **Backend:** Convex
 - **Linting:** oxlint in type-aware mode with `@zachsents/oxlint-config`; add `@zachsents/oxlint-config/react` for React
 - **Formatting:** Prettier with `@zachsents/prettier-config`
-- **Type checking:** tsgo, falling back to tsc
+- **Type checking:** TypeScript 7's native `tsc`
 - **Styling:** TailwindCSS v4
 - **Components:** shadcn/ui with Base UI
 - **Authentication:** Better Auth
@@ -63,7 +63,7 @@ Use these unless the user or repository specifies otherwise:
 
 Every package, whether standalone or in a workspace, should expose:
 
-- `typecheck`: `command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit`
+- `typecheck`: `tsc --noEmit`
 - `lint`: `oxlint --type-aware`
 - `lint:fix`: `oxlint --type-aware --fix-suggestions`
 - `check`: `bun run typecheck && bun run lint`

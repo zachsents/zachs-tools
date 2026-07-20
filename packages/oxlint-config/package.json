@@ -1,10 +1,11 @@
 {
   "name": "@zachsents/oxlint-config",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "typescript": "^6.0.3",
     "zshy": "^0.7.3"
   },
   "peerDependencies": {
@@ -34,7 +35,7 @@
     "access": "public"
   },
   "scripts": {
-    "typecheck": "command -v tsgo >/dev/null && tsgo --noEmit || tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "build": "zshy",
     "check": "bun run --cwd ../.. build:lint-plugin && bun run typecheck && bun run build",
     "prepublishOnly": "bun run check"

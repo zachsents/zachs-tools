@@ -7,6 +7,7 @@
     "moduleResolution": "NodeNext",
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
+    "rootDir": "./src",
     "outDir": "dist",
     "declaration": false,
     "sourceMap": true,
@@ -16,7 +17,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["bun"]
   },
   "include": ["src"],
   "exclude": ["extension", "node_modules"]

@@ -78,11 +78,11 @@ export function getSourceShape(
     return { kind: "unknown" }
   }
 
-  const propertyNames = new Set(
+  const propertyNames = new Set<string>(
     checker
       .getPropertiesOfType(apparent)
       .map(getStringPropertyName)
-      .filter((name): name is string => name !== null),
+      .filter((name: string | null): name is string => name !== null),
   )
 
   if (propertyNames.size === 0) {

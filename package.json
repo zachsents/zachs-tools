@@ -18,12 +18,13 @@
     "lint:fix": "bun run --cwd packages/ts-mcp lint:fix && bun run --cwd packages/eslint-plugin-zachs-rules lint:fix && eslint . --fix",
     "lint:oxlint": "bun run --cwd packages/ts-mcp lint && bun run --cwd packages/eslint-plugin-zachs-rules lint",
     "typecheck": "bun run typecheck:scripts && bun run --cwd packages/ts-mcp typecheck && bun run --cwd packages/eslint-plugin-zachs-rules typecheck",
-    "typecheck:scripts": "command -v tsgo >/dev/null && tsgo --noEmit -p scripts/tsconfig.json || tsc --noEmit -p scripts/tsconfig.json",
+    "typecheck:scripts": "tsc --noEmit -p scripts/tsconfig.json",
     "test": "bun run --cwd packages/ts-mcp test && bun run --cwd packages/eslint-plugin-zachs-rules test",
     "version:bump": "bun scripts/bump-workspace-version.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "^9.0.0",
     "eslint-plugin-jsdoc": "^63.0.13",
     "eslint-plugin-zachs-rules": "workspace:*",
@@ -32,6 +33,6 @@
     "oxlint-tsgolint": "^0.24.0",
     "prettier": "3.4.2",
     "prettier-plugin-jsdoc": "^1.8.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }

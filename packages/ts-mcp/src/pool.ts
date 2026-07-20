@@ -18,18 +18,18 @@ interface PoolEntry {
 }
 
 /**
- * Manages a pool of tsgo LSP instances, one per project root. Automatically
- * discovers the project root from file paths by walking up to the nearest
- * tsconfig.json. Instances are kept warm and shut down after a configurable
- * idle timeout.
+ * Manages a pool of TypeScript LSP instances, one per project root.
+ * Automatically discovers the project root from file paths by walking up to the
+ * nearest tsconfig.json. Instances are kept warm and shut down after a
+ * configurable idle timeout.
  */
-export class TsgoPool {
+export class TypeScriptPool {
   private entries = new Map<string, PoolEntry>()
 
   /**
    * Create an LSP client pool.
    *
-   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param binaryPath - Absolute path to the native tsc binary.
    * @param idleTimeoutMs - Time before an inactive client is shut down.
    */
   constructor(

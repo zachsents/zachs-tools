@@ -2,23 +2,9 @@
 
 **Give AI agents TypeScript type inference — no editor required.**
 
-A standalone MCP server that provides TypeScript type information using [tsgo](https://github.com/nicolo-ribaudo/tc39-proposal-type-annotations) (the native Go-based TypeScript compiler). Works with any MCP client that supports stdio MCP servers.
+A standalone MCP server that provides type information using [TypeScript 7's native compiler](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/). Works with any MCP client that supports stdio MCP servers.
 
-No running editor needed. It spawns and manages tsgo LSP instances directly, keeping them warm for fast subsequent queries.
-
-## Prerequisites
-
-Install tsgo globally:
-
-```bash
-npm install -g @typescript/native-preview
-# or
-bun add -g @typescript/native-preview
-# or
-pnpm add -g @typescript/native-preview
-# or
-yarn global add @typescript/native-preview
-```
+No running editor or global compiler install is needed. It includes TypeScript 7 and manages native LSP instances directly, keeping them warm for fast subsequent queries.
 
 ## Install
 
@@ -40,11 +26,11 @@ Add an MCP server named `ts-hover`:
 
 1. Agent calls a tool (e.g. `hover` with a file path and position)
 2. The MCP server finds the nearest `tsconfig.json` to determine the project root
-3. It spawns (or reuses) a tsgo LSP instance for that project
+3. It spawns (or reuses) a TypeScript 7 LSP instance for that project
 4. Returns the type information
-5. The tsgo instance stays warm for 5 minutes, making follow-up queries near-instant
+5. The TypeScript instance stays warm for 5 minutes, making follow-up queries near-instant
 
-Multiple project roots are handled automatically — each gets its own tsgo instance.
+Multiple project roots are handled automatically — each gets its own TypeScript instance.
 
 ## Tools
 
@@ -105,13 +91,11 @@ Get inferred type annotations for a line range — variable types, parameter typ
 | `startLine` | `number` | Start line (0-indexed, inclusive)    |
 | `endLine`   | `number` | End line (0-indexed, exclusive)      |
 
-> **Note:** Requires tsgo inlay hint support, which is still in development. The tool will start returning results as tsgo fills in this capability.
-
 ## Configuration
 
-| Env var     | Description                          |
-| ----------- | ------------------------------------ |
-| `TSGO_PATH` | Override the path to the tsgo binary |
+| Env var    | Description                                       |
+| ---------- | ------------------------------------------------- |
+| `TSC_PATH` | Override the path to the native TypeScript binary |
 
 ## License
 

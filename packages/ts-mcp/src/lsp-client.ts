@@ -5,7 +5,7 @@ import { z } from "zod"
 
 const REQUEST_TIMEOUT_MS = 30_000
 
-/** JSON-RPC response and server-request envelope accepted from tsgo. */
+/** JSON-RPC response and server-request envelope accepted from TypeScript. */
 const jsonRpcMessageSchema = z.object({
   jsonrpc: z.literal("2.0"),
   id: z.union([z.number(), z.string()]).optional(),
@@ -28,7 +28,7 @@ const rangeSchema = z.object({ start: positionSchema, end: positionSchema })
 /** Location shape returned by definition and reference requests. */
 const locationSchema = z.object({ uri: z.string(), range: rangeSchema })
 
-/** Diagnostic item shape returned by tsgo. */
+/** Diagnostic item shape returned by TypeScript. */
 const diagnosticItemSchema = z.object({
   range: rangeSchema,
   severity: z.number().optional(),
@@ -123,8 +123,8 @@ interface DocumentState {
 }
 
 /**
- * LSP JSON-RPC client that communicates with a tsgo process over stdio. Handles
- * Content-Length message framing, request/response correlation,
+ * LSP JSON-RPC client that communicates with a TypeScript process over stdio.
+ * Handles Content-Length message framing, request/response correlation,
  * server-initiated requests (e.g. client/registerCapability), and automatic
  * document open/change tracking.
  */
@@ -138,9 +138,9 @@ export class LspClient {
   private alive = true
 
   /**
-   * Start a tsgo LSP child process.
+   * Start a TypeScript LSP child process.
    *
-   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param binaryPath - Absolute path to the native tsc binary.
    * @param rootUri - LSP root URI for the project.
    * @throws When the child process does not expose piped stdio.
    */
@@ -153,7 +153,7 @@ export class LspClient {
     })
 
     if (!this.proc.stdin || !this.proc.stdout) {
-      throw new Error("Failed to create tsgo process with piped stdio")
+      throw new Error("Failed to create TypeScript process with piped stdio")
     }
     this.stdin = this.proc.stdin
 
@@ -165,7 +165,7 @@ export class LspClient {
     this.proc.on("exit", (code) => {
       this.alive = false
       for (const [, req] of this.pending) {
-        req.reject(new Error(`tsgo exited with code ${code}`))
+        req.reject(new Error(`TypeScript exited with code ${code}`))
         clearTimeout(req.timer)
       }
       this.pending.clear()
@@ -175,7 +175,7 @@ export class LspClient {
   /**
    * Create and initialize a new LSP client for a project root
    *
-   * @param binaryPath - Absolute path to the tsgo native binary.
+   * @param binaryPath - Absolute path to the native tsc binary.
    * @param rootUri - LSP root URI for the project.
    * @returns An initialized LSP client.
    */
@@ -526,9 +526,9 @@ export class LspClient {
   }
 
   /**
-   * Re-read all previously opened documents from disk and push changes to tsgo.
-   * This ensures that edits to imported/dependency files are picked up before
-   * we query a file that depends on them.
+   * Re-read all previously opened documents from disk and push changes to
+   * TypeScript. This ensures that edits to imported/dependency files are picked
+   * up before we query a file that depends on them.
    */
   private async refreshOpenDocuments(): Promise<void> {
     for (const [uri, state] of this.documents) {

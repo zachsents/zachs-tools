@@ -1,12 +1,12 @@
 /** Quick smoke test that exercises all pool methods. Run: bun test/smoke.ts */
 import { resolve } from "node:path"
-import { TsgoPool } from "../src/pool.ts"
-import { resolveTsgoBinary } from "../src/resolve-binary.ts"
+import { TypeScriptPool } from "../src/pool.ts"
+import { resolveTscBinary } from "../src/resolve-binary.ts"
 
-const binary = resolveTsgoBinary()
-console.error(`Using tsgo binary: ${binary}`)
+const binary = resolveTscBinary()
+console.error(`Using TypeScript binary: ${binary}`)
 
-const pool = new TsgoPool(binary)
+const pool = new TypeScriptPool(binary)
 const testFile = resolve(import.meta.dirname, "sample.ts")
 
 // 1. Hover + definition
