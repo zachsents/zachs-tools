@@ -21,7 +21,6 @@ type ParameterCandidate = {
  * Check whether a declaration is exported.
  *
  * @param node - Declaration node to inspect.
- * @returns Whether the declaration is directly exported.
  */
 function isExported(node: TSESTree.Node): boolean {
   return (
@@ -34,7 +33,6 @@ function isExported(node: TSESTree.Node): boolean {
  * Check whether an observed type is useful for narrowing.
  *
  * @param type - Observed argument type.
- * @returns Whether the type can support a useful narrowing suggestion.
  */
 function isUsableObservedType(type: ts.Type): boolean {
   return !(
@@ -52,7 +50,6 @@ function isUsableObservedType(type: ts.Type): boolean {
  * @param candidate - Candidate replacement type.
  * @param declared - Type currently declared on the parameter.
  * @param checker - TypeScript checker used for assignability tests.
- * @returns Whether the candidate is safely and strictly narrower.
  */
 function isStrictlyNarrower(
   candidate: ts.Type,
@@ -74,7 +71,6 @@ function isStrictlyNarrower(
  *
  * @param observedTypes - Argument types collected from direct calls.
  * @param checker - TypeScript checker used to widen and compare types.
- * @returns A common observed type, or null when none is suitable.
  */
 function findCommonObservedType(
   observedTypes: ts.Type[],
@@ -101,7 +97,6 @@ function findCommonObservedType(
  * @param checker - TypeScript checker used to resolve the symbol.
  * @param node - ESTree identifier for the function name.
  * @param services - Parser services mapping ESTree to TypeScript nodes.
- * @returns The unique declaration symbol, or null when resolution is ambiguous.
  */
 function getFunctionNameSymbol(
   checker: ts.TypeChecker,
@@ -123,7 +118,6 @@ function getFunctionNameSymbol(
  * @param checker - TypeScript checker used to resolve declared types.
  * @param estreeParameters - Function parameters from the ESTree tree.
  * @param tsParameters - Matching parameters from the TypeScript tree.
- * @returns Supported parameters that can be evaluated for narrowing.
  */
 function getParameters(
   checker: ts.TypeChecker,

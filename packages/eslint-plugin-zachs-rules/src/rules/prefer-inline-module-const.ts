@@ -13,7 +13,6 @@ import {
  * Check whether a name uses screaming-snake-case syntax.
  *
  * @param name - Identifier to inspect.
- * @returns Whether the name uses screaming-snake-case syntax.
  */
 function isConstantCase(name: string) {
   return /^[A-Z][A-Z0-9_]*$/u.test(name)

@@ -16,7 +16,6 @@ export type SourceShape =
  * Check whether a type cannot provide a stable property shape.
  *
  * @param type - TypeScript type to inspect.
- * @returns Whether the type lacks a stable property shape.
  */
 function isUnknownLikeType(type: ts.Type): boolean {
   return Boolean(
@@ -33,7 +32,6 @@ function isUnknownLikeType(type: ts.Type): boolean {
  *
  * @param type - TypeScript type to inspect.
  * @param checker - TypeScript checker used to resolve index signatures.
- * @returns Whether the type accepts arbitrary string or number keys.
  */
 function hasIndexSignature(type: ts.Type, checker: ts.TypeChecker): boolean {
   const apparent = checker.getApparentType(type)
@@ -47,7 +45,6 @@ function hasIndexSignature(type: ts.Type, checker: ts.TypeChecker): boolean {
  * Return a user-facing property name for a TypeScript symbol.
  *
  * @param symbol - TypeScript property symbol.
- * @returns Its user-facing name, or null for internal symbols.
  */
 function getStringPropertyName(symbol: ts.Symbol): string | null {
   const name = symbol.getName()
@@ -59,7 +56,6 @@ function getStringPropertyName(symbol: ts.Symbol): string | null {
  *
  * @param services - Type-aware parser services for the linted program.
  * @param node - ESTree node whose type supplies the source shape.
- * @returns The known property shape, or an unknown-shape marker.
  */
 export function getSourceShape(
   services: ParserServicesWithTypeInformation,

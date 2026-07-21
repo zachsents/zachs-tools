@@ -10,7 +10,6 @@ type VariableDefinition = TSESLint.Scope.Definitions.VariableDefinition
  * Find a simple initialized const definition for a variable.
  *
  * @param variable - Scope variable to inspect.
- * @returns Its initialized const definition, when supported.
  */
 export function getConstDefinition(
   variable: TSESLint.Scope.Variable,
@@ -38,7 +37,6 @@ export function getConstDefinition(
  * Check whether a declaration is directly exported.
  *
  * @param definition - Variable definition to inspect.
- * @returns Whether the declaration is directly exported.
  */
 export function isExported(definition: VariableDefinition) {
   return (
@@ -51,7 +49,6 @@ export function isExported(definition: VariableDefinition) {
  * Check whether a declaration belongs directly to the module.
  *
  * @param definition - Variable definition to inspect.
- * @returns Whether the declaration belongs directly to the module.
  */
 export function isModuleLevel(definition: VariableDefinition) {
   const parent = definition.parent.parent
@@ -68,7 +65,6 @@ export function isModuleLevel(definition: VariableDefinition) {
  * Check whether a declaration creates a loop binding.
  *
  * @param definition - Variable definition to inspect.
- * @returns Whether the declaration creates a loop binding.
  */
 export function isLoopVariable(definition: VariableDefinition) {
   const declaration = definition.parent
@@ -86,7 +82,6 @@ export function isLoopVariable(definition: VariableDefinition) {
  * Check whether a variable is reassigned after initialization.
  *
  * @param variable - Scope variable to inspect.
- * @returns Whether it is written after initialization.
  */
 export function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
   return variable.references.some(
@@ -99,7 +94,6 @@ export function hasNonInitializerWrite(variable: TSESLint.Scope.Variable) {
  *
  * @param variable - Scope variable whose references should be collected.
  * @param sourceCode - Parsed source used to inspect reference ancestors.
- * @returns The runtime read references.
  */
 export function getRuntimeReadReferences(
   variable: TSESLint.Scope.Variable,
@@ -119,7 +113,6 @@ export function getRuntimeReadReferences(
  *
  * @param definition - Variable definition to inspect.
  * @param sourceCode - Parsed source used to read leading comments.
- * @returns Whether a documentation block precedes the declaration.
  */
 export function hasDocumentationComment(
   definition: VariableDefinition,

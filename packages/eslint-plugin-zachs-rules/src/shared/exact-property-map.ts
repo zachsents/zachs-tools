@@ -15,7 +15,6 @@ export type SourceMappingGroup = {
  * Read a static property name from an object property key.
  *
  * @param key - Non-computed object property key.
- * @returns Its static string name, or null when unavailable.
  */
 function getStaticPropertyName(
   key: TSESTree.PropertyNameNonComputed,
@@ -35,7 +34,6 @@ function getStaticPropertyName(
  * Read the property name from a non-computed member expression.
  *
  * @param member - Member expression to inspect.
- * @returns Its identifier property name, or null when unsupported.
  */
 function getIdentifierMemberName(
   member: TSESTree.MemberExpression,
@@ -51,7 +49,6 @@ function getIdentifierMemberName(
  * Return an expression when it is a direct identifier reference.
  *
  * @param expression - Expression to inspect.
- * @returns The expression as an identifier, or null for other forms.
  */
 function getSourceIdentifier(
   expression: TSESTree.Expression,
@@ -67,7 +64,6 @@ function getSourceIdentifier(
  * Match a property that maps a source member under the same name.
  *
  * @param property - Object property to inspect.
- * @returns Its same-named source mapping, or null when it does not match.
  */
 function isSameNamedIdentifierMemberMapping(
   property: TSESTree.Property,
@@ -96,7 +92,6 @@ function isSameNamedIdentifierMemberMapping(
  * Return the identifier used by a spread element.
  *
  * @param property - Spread element to inspect.
- * @returns Its source identifier, or null for non-identifier arguments.
  */
 function getSpreadIdentifier(
   property: TSESTree.SpreadElement,
@@ -111,7 +106,6 @@ function getSpreadIdentifier(
  *
  * @param objectExpression - Object literal to analyze.
  * @param minProperties - Minimum number of mappings required per source.
- * @returns Eligible same-named mappings grouped by source object.
  */
 export function findSameNamedSourceMappings(
   objectExpression: TSESTree.ObjectExpression,

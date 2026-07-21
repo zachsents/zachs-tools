@@ -177,7 +177,6 @@ export class LspClient {
    *
    * @param binaryPath - Absolute path to the native tsc binary.
    * @param rootUri - LSP root URI for the project.
-   * @returns An initialized LSP client.
    */
   static async create(binaryPath: string, rootUri: string): Promise<LspClient> {
     const client = new LspClient(binaryPath, rootUri)
@@ -185,7 +184,7 @@ export class LspClient {
     return client
   }
 
-  /** @returns Whether the child process is available for requests. */
+  /** Check whether the child process is available for requests. */
   get isAlive() {
     return this.alive
   }
@@ -196,7 +195,6 @@ export class LspClient {
    * @param filePath - Absolute path to the source file.
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
-   * @returns Rendered hover content, or null when unavailable.
    */
   async hover(
     filePath: string,
@@ -225,7 +223,6 @@ export class LspClient {
    * @param filePath - Absolute path to the source file.
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
-   * @returns Definition locations reported for the selected symbol.
    */
   async definition(
     filePath: string,
@@ -249,7 +246,6 @@ export class LspClient {
    * Pull diagnostics for a file
    *
    * @param filePath - Absolute path to the source file.
-   * @returns Diagnostics reported for the file.
    */
   async diagnostics(filePath: string): Promise<LspDiagnostic[]> {
     if (!this.alive) throw new Error("LSP client is not alive")
@@ -292,7 +288,6 @@ export class LspClient {
    * @param range.end.line - Zero-based end line.
    * @param range.end.character - Zero-based end character.
    * @param diagnostics - Diagnostics used to scope available actions.
-   * @returns Code actions returned for the range.
    */
   async codeActions(
     filePath: string,
@@ -365,7 +360,6 @@ export class LspClient {
    * Get a structured outline of all symbols in a file
    *
    * @param filePath - Absolute path to the source file.
-   * @returns The file's hierarchical symbol outline.
    */
   async documentSymbols(filePath: string): Promise<LspSymbol[]> {
     if (!this.alive) throw new Error("LSP client is not alive")
@@ -390,7 +384,6 @@ export class LspClient {
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
    * @param newName - Replacement symbol name.
-   * @returns Text edits required to perform the rename.
    */
   async rename(
     filePath: string,
@@ -418,7 +411,6 @@ export class LspClient {
    * @param filePath - Absolute path to the source file.
    * @param startLine - Zero-based inclusive start line.
    * @param endLine - Zero-based exclusive end line.
-   * @returns Inlay hints reported for the requested range.
    */
   async inlayHints(
     filePath: string,
@@ -475,7 +467,6 @@ export class LspClient {
    * @param filePath - Absolute path to the source file.
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
-   * @returns Locations that reference the selected symbol.
    */
   async references(
     filePath: string,
@@ -710,7 +701,6 @@ export class LspClient {
  * Convert a file path to an LSP file URI.
  *
  * @param filePath - Absolute path to convert.
- * @returns The corresponding file URI.
  */
 function pathToUri(filePath: string): string {
   return `file://${filePath}`
@@ -720,7 +710,6 @@ function pathToUri(filePath: string): string {
  * Convert an LSP file URI to a file path.
  *
  * @param uri - File URI to convert.
- * @returns The corresponding absolute file path.
  */
 function uriToPath(uri: string): string {
   return uri.replace(/^file:\/\//, "")
@@ -731,7 +720,6 @@ function uriToPath(uri: string): string {
  * Handles single objects, arrays, and null.
  *
  * @param result - Raw LSP definition response.
- * @returns Normalized definition locations.
  */
 function parseLocations(result: unknown): LspLocation[] {
   if (result == null) return []
@@ -773,7 +761,6 @@ function parseLocations(result: unknown): LspLocation[] {
  * reconstruct parent-child relationships.
  *
  * @param items - Raw LSP symbol information records.
- * @returns A hierarchical symbol outline.
  */
 function buildSymbolTree(items: unknown[]): LspSymbol[] {
   const flat: Array<{ symbol: LspSymbol; containerName?: string }> = []
@@ -828,7 +815,6 @@ function buildSymbolTree(items: unknown[]): LspSymbol[] {
  * Parse a WorkspaceEdit into flat LspTextEdit[]
  *
  * @param result - Raw LSP workspace edit.
- * @returns Flattened text edits.
  */
 function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
   const parsed = z
@@ -858,7 +844,6 @@ function parseWorkspaceEdit(result: unknown): LspTextEdit[] {
  * Return the LSP language identifier for a source file.
  *
  * @param filePath - Source file path.
- * @returns The matching LSP language identifier.
  */
 function getLanguageId(filePath: string): string {
   switch (extname(filePath)) {
@@ -884,7 +869,6 @@ function getLanguageId(filePath: string): string {
  * plain strings, and arrays of either.
  *
  * @param contents - Raw LSP hover content.
- * @returns Rendered hover text, or null when the content is unsupported.
  */
 function formatHoverContents(contents: unknown): string | null {
   const str = z.string().safeParse(contents)

@@ -8,7 +8,6 @@ import { getSourceShape } from "../shared/type-shape"
  *
  * @param mappedKeys - Property names mapped by the object literal.
  * @param sourceProperties - Statically known properties on the source object.
- * @returns Whether the mapped keys form a strict subset of the source shape.
  */
 function isStrictSubset(
   mappedKeys: Set<string>,

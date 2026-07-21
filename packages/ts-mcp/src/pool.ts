@@ -43,7 +43,6 @@ export class TypeScriptPool {
    * @param filePath - Absolute path to the source file.
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
-   * @returns Hover text and the first definition location, when available.
    */
   async hoverWithDefinition(
     filePath: string,
@@ -62,7 +61,6 @@ export class TypeScriptPool {
    * Get diagnostics for a file with available fixes for each error
    *
    * @param filePath - Absolute path to the source file.
-   * @returns Diagnostics and the code actions available for them.
    */
   async diagnosticsWithFixes(
     filePath: string,
@@ -89,7 +87,6 @@ export class TypeScriptPool {
    * @param filePath - Absolute path to the source file.
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
-   * @returns Locations that reference the selected symbol.
    */
   async references(
     filePath: string,
@@ -107,7 +104,6 @@ export class TypeScriptPool {
    * Get a structured outline of all symbols in a file
    *
    * @param filePath - Absolute path to the source file.
-   * @returns The file's hierarchical symbol outline.
    */
   async outline(filePath: string): Promise<LspSymbol[]> {
     return (await this.getClient(filePath)).documentSymbols(filePath)
@@ -120,7 +116,6 @@ export class TypeScriptPool {
    * @param line - Zero-based source line.
    * @param character - Zero-based character offset.
    * @param newName - Replacement symbol name.
-   * @returns Text edits required to perform the rename.
    */
   async rename(
     filePath: string,
@@ -142,7 +137,6 @@ export class TypeScriptPool {
    * @param filePath - Absolute path to the source file.
    * @param startLine - Zero-based inclusive start line.
    * @param endLine - Zero-based exclusive end line.
-   * @returns Inlay hints reported for the requested range.
    */
   async inlayHints(
     filePath: string,
@@ -171,7 +165,6 @@ export class TypeScriptPool {
    * Get or create the client for a file's project.
    *
    * @param filePath - Absolute path used to locate the project.
-   * @returns A live client for the file's project.
    */
   private async getClient(filePath: string): Promise<LspClient> {
     const projectRoot = findProjectRoot(filePath)
@@ -203,7 +196,6 @@ export class TypeScriptPool {
    * Schedule an idle client for shutdown.
    *
    * @param projectRoot - Absolute path to the client's project root.
-   * @returns The scheduled idle timer.
    */
   private startIdleTimer(projectRoot: string): Timer {
     return setTimeout(async () => {
@@ -231,7 +223,6 @@ export class TypeScriptPool {
  * Walk up from a file path to find the nearest tsconfig.json
  *
  * @param filePath - Absolute path used to start the search.
- * @returns The nearest project root, or the file's directory as a fallback.
  */
 function findProjectRoot(filePath: string): string {
   let dir = dirname(filePath)

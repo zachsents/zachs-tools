@@ -10,8 +10,8 @@ const pool = new TypeScriptPool(binary)
 const testFile = resolve(import.meta.dirname, "sample.ts")
 
 // 1. Hover + definition
-console.error(`\n--- hover (createWorkflow, line 38 char 9) ---`)
-const hover = await pool.hoverWithDefinition(testFile, 38, 9)
+console.error(`\n--- hover (createWorkflow, line 37 char 9) ---`)
+const hover = await pool.hoverWithDefinition(testFile, 37, 9)
 console.log("Hover:", hover.hover?.split("\n")[0])
 console.log("Definition:", hover.definition)
 
@@ -28,8 +28,8 @@ for (const a of actions) {
 }
 
 // 3. References for createWorkflow
-console.error(`\n--- references (createWorkflow, line 38 char 9) ---`)
-const refs = await pool.references(testFile, 38, 9)
+console.error(`\n--- references (createWorkflow, line 37 char 9) ---`)
+const refs = await pool.references(testFile, 37, 9)
 console.log(`Found ${refs.length} reference(s):`)
 for (const ref of refs) {
   console.log(`  ${ref.file}:${ref.line}:${ref.character}`)
@@ -48,9 +48,9 @@ for (const sym of symbols) {
 
 // 5. Rename (dry run — just see what edits would be produced)
 console.error(
-  `\n--- rename (createWorkflow -> buildWorkflow, line 38 char 9) ---`,
+  `\n--- rename (createWorkflow -> buildWorkflow, line 37 char 9) ---`,
 )
-const renameEdits = await pool.rename(testFile, 38, 9, "buildWorkflow")
+const renameEdits = await pool.rename(testFile, 37, 9, "buildWorkflow")
 console.log(`Rename edits: ${renameEdits.length}`)
 for (const e of renameEdits) {
   console.log(
@@ -58,9 +58,9 @@ for (const e of renameEdits) {
   )
 }
 
-// 6. Inlay hints (lines 50-65 — example usage section with inferred types)
-console.error(`\n--- inlay hints (lines 50-65) ---`)
-const hints = await pool.inlayHints(testFile, 50, 65)
+// 6. Inlay hints (lines 49-64 — example usage section with inferred types)
+console.error(`\n--- inlay hints (lines 49-64) ---`)
+const hints = await pool.inlayHints(testFile, 49, 64)
 console.log(`Inlay hints: ${hints.length}`)
 for (const h of hints) {
   console.log(`  ${h.line}:${h.character} ${h.kind}: ${h.text}`)

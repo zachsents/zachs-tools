@@ -41,6 +41,12 @@ Use these unless the user or repository specifies otherwise:
 - Avoid unnecessary spreads and manual property re-listing. Prefer object spread, `R.pick`, or `R.omit`.
 - Use the simplest correct condition. Prefer truthy checks where appropriate; distinguish `null` from `undefined` only when needed.
 
+## JSDoc
+
+- Do not require or add `@returns` tags. Let the TypeScript signature describe
+  the return type, and put non-obvious return semantics in the JSDoc summary
+  instead of maintaining a redundant tag.
+
 ## TypeScript
 
 - Use `ts-mcp` throughout implementation: inspect inferred types with hover and inlay hints, find references before changing shared symbols, and check diagnostics after meaningful edits.

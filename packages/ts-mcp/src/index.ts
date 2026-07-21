@@ -290,7 +290,6 @@ function formatSymbolTree(
  * Format an LSP text edit for CLI output.
  *
  * @param edit - Text edit to render.
- * @returns A human-readable summary of the edit.
  */
 function formatTextEdit(edit: LspCodeAction["edits"][number]): string {
   const loc = `    ${edit.file}:${edit.startLine}:${edit.startCharacter}`

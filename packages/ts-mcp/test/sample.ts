@@ -34,7 +34,6 @@ interface Workflow {
  *   const workflow = createWorkflow({ name: "test", steps: [] })
  *
  * @param config - The workflow configuration
- * @returns A new Workflow instance
  */
 function createWorkflow(config: WorkflowConfig): Workflow {
   return {

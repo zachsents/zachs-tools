@@ -8,7 +8,6 @@ const PLATFORM_PACKAGE = `@typescript/typescript-${process.platform}-${process.a
  * Resolves the TypeScript 7 native compiler installed for the current platform.
  * The native binary is required (not the Node wrapper) for stdio piping.
  *
- * @returns The absolute path to the native tsc binary.
  * @throws When the configured or installed native binary cannot be found.
  */
 export function resolveTscBinary(): string {
