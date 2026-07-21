@@ -22,3 +22,22 @@
 - One component or hook per file unless trivial.
 - Avoid `useEffect` whenever possible; prefer event-driven architecture.
 - Always strictly follow the Rules of React.
+
+## JSDoc
+
+- Let TypeScript prop types document a component's parameters. Require a useful
+  component-level JSDoc description when appropriate, but do not duplicate the
+  prop type as `@param` tags that can become stale.
+- When extending `@zachsents/oxlint-config/react`, preserve its
+  `jsdoc-js/require-param` override. If configuring the rule directly, use this
+  pattern so typed props are exempt while untyped parameters remain checked:
+
+  ```ts
+  "jsdoc-js/require-param": [
+    "error",
+    {
+      enableFixer: false,
+      interfaceExemptsParamsCheck: true,
+    },
+  ]
+  ```

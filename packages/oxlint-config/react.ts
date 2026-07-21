@@ -16,6 +16,14 @@ export default defineConfig({
     },
   ],
   rules: {
+    "jsdoc-js/require-param": [
+      "error",
+      {
+        enableFixer: false,
+        interfaceExemptsParamsCheck: true,
+      },
+    ],
+
     "react/react-in-jsx-scope": "off",
     "react/no-children-prop": "off",
     "react/jsx-key": "error",
