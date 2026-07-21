@@ -13,10 +13,14 @@ agent rules without requiring changes to the consumer's application code.
 
 1. Read the target repository's applicable `AGENTS.md` files and inspect its
    dirty worktree before making changes. Preserve unrelated work.
-2. Identify the repository's package manager from `packageManager` and its
+2. Read the current `follow-zach-coding-standards` skill and every reference it
+   marks as applicable to the target repository. Treat those rules as the
+   desired state for the migration, even when the Zach Codex plugin version is
+   unchanged or a published package diff does not mention them.
+3. Identify the repository's package manager from `packageManager` and its
    lockfile. Keep the existing package manager; use Bun when the repository
    already uses Bun or does not specify one.
-3. Search manifests, lockfiles, config files, scripts, MCP configuration,
+4. Search manifests, lockfiles, config files, scripts, MCP configuration,
    documentation, and agent guidance for zachs-tools artifacts. Check at least:
    - `@zachsents/agent-rules`
    - `@zachsents/oxlint-config`
@@ -26,7 +30,7 @@ agent rules without requiring changes to the consumer's application code.
    - `@zachsents/zach-codex`
    - copied or adapted Zach rules under `AGENTS.md`, `.agents/`, `.codex/`, or
      other agent-instruction files
-4. Update packages that the project actually uses. Do not add every known
+5. Update packages that the project actually uses. Do not add every known
    package merely because it is listed here, and do not convert the project to
    a different toolchain without an explicit request.
 
@@ -59,23 +63,27 @@ Do not modify an installed plugin cache directly.
 
 ## Update The Consumer Repository
 
-1. Update all discovered zachs-tools dependencies to their latest releases in
+1. Audit the consumer's current configuration, package scripts, dependencies,
+   documentation, and durable agent guidance against the current coding rules.
+   Do this independently of version and package diffs: an already-current
+   Git-backed plugin can contain guidance that the consumer has not adopted.
+2. Update all discovered zachs-tools dependencies to their latest releases in
    one package-manager operation when practical so the resolver can keep peer
    dependencies coherent. With Bun, use `bun update <packages...> --latest`.
-2. Let the package manager update manifests and the lockfile. Preserve the
+3. Let the package manager update manifests and the lockfile. Preserve the
    project's existing dependency sections and version-range conventions unless
    the new package's documented peer relationship requires a change.
-3. Translate the published diff into project changes. Inspect actual usage and
-   update any affected:
+4. Reconcile both the current coding-rule audit and the published package diff
+   with actual usage. Update any affected:
    - config imports, exports, composition, and options
    - package scripts and required peer tools
    - MCP server declarations or command arguments
    - `AGENTS.md`, `.agents/`, `.codex/`, and other durable agent guidance
    - prompts or copied rules that now conflict with the latest plugin guidance
    - documentation that tells contributors to use superseded commands
-4. Search again for removed APIs, obsolete rules, old commands, and duplicated
-   copied guidance identified in the diff. Version checks alone do not complete
-   the migration.
+5. Search again for removed APIs, obsolete rules, old commands, and duplicated
+   copied guidance identified by either the current rules or the package diff.
+   Version checks alone do not complete the migration.
 
 ## Refresh The Global Zach Codex Plugin
 
@@ -113,6 +121,8 @@ loading, formatter loading, or MCP startup when those surfaces changed.
 Report:
 
 - every package and plugin version before and after
+- discrepancies found by reviewing the consumer against the current coding
+  rules, including migrations made when package versions were already current
 - the important release-diff findings
 - project config, prompt, rule, or documentation migrations made because of
   those findings
