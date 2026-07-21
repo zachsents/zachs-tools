@@ -43,6 +43,9 @@ Use these unless the user or repository specifies otherwise:
 
 ## JSDoc
 
+- For destructured object parameters, use a meaningful parent name in property
+  paths—usually `options` for an options object—rather than a synthetic name
+  such as `root0`.
 - Do not require or add `@returns` tags. Let the TypeScript signature describe
   the return type, and put non-obvious return semantics in the JSDoc summary
   instead of maintaining a redundant tag.

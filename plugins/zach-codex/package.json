@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/zach-codex",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Zach's reusable coding standards and preferred MCP integrations for Codex.",
   "license": "MIT",
   "repository": {
