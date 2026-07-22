@@ -22,7 +22,18 @@ Use these unless the user or repository specifies otherwise:
 - **Styling:** TailwindCSS v4
 - **Components:** shadcn/ui with Base UI
 - **Authentication:** Better Auth
-- **Utilities:** Remeda, `@zachsents/zippy`, Zod v4, date-fns
+- **Utilities:** `@zachsents/zippy`, Remeda, Zod v4, date-fns
+
+## Utilities
+
+- Prefer `@zachsents/zippy` over Remeda or a one-off helper when it makes the
+  code cleaner or preserves stronger type inference. Reach for its
+  data-first/data-last iterable and object helpers, type-safe selectors and
+  guards, math utilities, matching and zipping helpers, and pipelines.
+- Prefer zippy's `pipe` for multi-step transformations when the pipeline reads
+  more clearly than nested calls or chained array methods. Keep a direct call
+  for a single simple operation.
+- Use Remeda when zippy does not cover the needed operation cleanly.
 
 ## Code Style
 
@@ -33,7 +44,6 @@ Use these unless the user or repository specifies otherwise:
 - Prefer declarative, expression-based code over imperative mutation for stronger type inference.
   - Build objects and arrays in one expression with conditional spreads and ternaries.
   - Prefer `filter`, `map`, and `flatMap` over loops with `push`, except when a loop materially improves performance, such as short-circuiting.
-- Use Remeda (`R`) or `@zachsents/zippy` when JavaScript lacks a well-typed utility. Prefer zippy's `pipe` over chained array methods when it fits.
 - Use `Promise.all` for independent async work.
 - Use `try/catch` only for meaningful recovery; never swallow or merely re-log errors.
 - Prefer self-explanatory code. Comment non-obvious intent, never obvious behavior. Prefer an inline comment over extracting a one-use helper only to explain it.
