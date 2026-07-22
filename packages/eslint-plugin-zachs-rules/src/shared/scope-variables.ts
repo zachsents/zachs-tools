@@ -1,8 +1,4 @@
-import {
-  AST_NODE_TYPES,
-  AST_TOKEN_TYPES,
-  TSESLint,
-} from "@typescript-eslint/utils"
+import { AST_NODE_TYPES, TSESLint } from "@typescript-eslint/utils"
 
 type VariableDefinition = TSESLint.Scope.Definitions.VariableDefinition
 
@@ -109,21 +105,16 @@ export function getRuntimeReadReferences(
 }
 
 /**
- * Check whether a const declaration has an attached documentation comment.
+ * Check whether a const declaration has an attached leading comment.
  *
  * @param definition - Variable definition to inspect.
  * @param sourceCode - Parsed source used to read leading comments.
  */
-export function hasDocumentationComment(
+export function hasLeadingComment(
   definition: VariableDefinition,
   sourceCode: TSESLint.SourceCode,
 ) {
-  return sourceCode
-    .getCommentsBefore(definition.parent)
-    .some(
-      (comment) =>
-        comment.type === AST_TOKEN_TYPES.Block && comment.value.startsWith("*"),
-    )
+  return sourceCode.getCommentsBefore(definition.parent).length > 0
 }
 
 /**

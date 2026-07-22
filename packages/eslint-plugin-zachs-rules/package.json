@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-zachs-rules",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A small set of custom ESLint rules.",
   "license": "MIT",
   "type": "module",

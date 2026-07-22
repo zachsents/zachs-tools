@@ -11,6 +11,14 @@ console.log(API_URL)
 const documented = getValue()
 console.log(documented)
 
+// A line comment explains why this value is intentionally named.
+const lineCommented = getValue()
+console.log(lineCommented)
+
+/* A regular block comment can explain the same intent. */
+const blockCommented = getValue()
+console.log(blockCommented)
+
 const twice = getValue()
 console.log(twice)
 console.log(twice)

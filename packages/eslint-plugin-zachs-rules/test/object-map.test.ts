@@ -102,7 +102,7 @@ test("runs zachs-rules custom rules", async () => {
       file: "fixtures/single-use.ts",
       ruleId: "zachs-rules/prefer-inline-module-const",
       message:
-        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
     },
     {
       file: "fixtures/single-use.ts",
@@ -131,7 +131,7 @@ test("runs zachs-rules custom rules", async () => {
   ])
 })
 
-test("module const rule skips documented, constant-case, and type-only uses", async () => {
+test("module const rule skips commented, constant-case, and type-only uses", async () => {
   expect(
     (
       await new ESLint({
@@ -166,7 +166,7 @@ test("module const rule skips documented, constant-case, and type-only uses", as
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
   ])
 })
 
@@ -208,8 +208,8 @@ test("can configure the maximum use threshold", async () => {
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
-    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
   ])
 })
 

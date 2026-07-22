@@ -2,7 +2,7 @@ import { createRule } from "../shared/create-rule"
 import {
   getConstDefinition,
   getRuntimeReadReferences,
-  hasDocumentationComment,
+  hasLeadingComment,
   hasNonInitializerWrite,
   isExported,
   isModuleLevel,
@@ -40,7 +40,7 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
     ],
     messages: {
       preferInlineModuleConst:
-        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or documenting it with `/** */`.",
+        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
     },
   },
   defaultOptions: [{ maxUses: 1 }],
@@ -60,7 +60,7 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
               !isModuleLevel(definition) ||
               isExported(definition) ||
               isConstantCase(variable.name) ||
-              hasDocumentationComment(definition, context.sourceCode) ||
+              hasLeadingComment(definition, context.sourceCode) ||
               hasNonInitializerWrite(variable)
             ) {
               continue
