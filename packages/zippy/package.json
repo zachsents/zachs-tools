@@ -1,0 +1,68 @@
+{
+  "name": "@zachsents/zippy",
+  "version": "1.1.4",
+  "description": "A TypeScript utility library.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools.git",
+    "directory": "packages/zippy"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "zshy": {
+    "exports": {
+      ".": "./src/index.ts"
+    },
+    "cjs": false,
+    "conditions": {
+      "bun": "src"
+    }
+  },
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --type-aware --fix-suggestions",
+    "format": "prettier . --write",
+    "fix": "bun run typecheck && bun run lint:fix && bun run format",
+    "check:fn": "./scripts/check-function.sh",
+    "typecheck:file": "./scripts/typecheck-file.sh",
+    "test": "bun test --concurrent",
+    "build": "zshy",
+    "pack:dry": "npm pack --dry-run --json",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run build && bun run pack:dry",
+    "prepublishOnly": "bun run check"
+  },
+  "files": [
+    "dist",
+    "src/**/*.ts",
+    "!src/lib/autocomplete-test-utils.ts",
+    "!src/**/*.test.ts",
+    "!src/**/*.type-test.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "remeda": "^2.39.0",
+    "type-fest": "^5.7.0",
+    "typescript": "^6.0.3",
+    "zshy": "^0.7.2"
+  }
+}

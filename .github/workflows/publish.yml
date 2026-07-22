@@ -31,6 +31,7 @@ jobs:
           - packages/prettier-config
           - packages/oxlint-config
           - packages/agent-rules
+          - packages/zippy
           - plugins/zach-codex
     steps:
       - name: Checkout
