@@ -46,6 +46,7 @@ Use these unless the user or repository specifies otherwise:
 - Prefer `const`; mutate only when required.
 - Inline single-use values and helpers unless it harms readability. Hoist only reused or semantically meaningful values.
 - Remove code structure left over from iterative edits. Avoid deep nesting, misdirection, and defensive handling for impossible cases.
+- Do not raise theoretical edge cases without a realistic execution path in this system.
 - Prefer declarative, expression-based code over imperative mutation for stronger type inference.
   - Build objects and arrays in one expression with conditional spreads and ternaries.
   - Prefer `filter`, `map`, and `flatMap` over loops with `push`, except when a loop materially improves performance, such as short-circuiting.
