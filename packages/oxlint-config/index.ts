@@ -53,6 +53,7 @@ export default defineConfig({
       "error",
       { ignoreNestedFunctionReads: true },
     ],
+    "zachs-rules/prefer-inline-trivial-call-wrapper": "warn",
     "zachs-rules/require-disable-directive-description": "error",
     "typescript/consistent-return": "off",
     "typescript/no-explicit-any": "error",

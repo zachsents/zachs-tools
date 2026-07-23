@@ -30,6 +30,11 @@ Use these unless the user or repository specifies otherwise:
   code cleaner or preserves stronger type inference. Reach for its
   data-first/data-last iterable and object helpers, type-safe selectors and
   guards, math utilities, matching and zipping helpers, and pipelines.
+- Prefer native array methods for a simple direct transformation of an array,
+  such as `values.map(mapper)`, `values.filter(predicate)`, or
+  `values.flatMap(mapper)`. Use zippy's collection helpers when they add value,
+  such as for a non-array iterable, a property-path selector, a data-last
+  pipeline, or stronger type inference.
 - Prefer zippy's `pipe` for multi-step transformations when the pipeline reads
   more clearly than nested calls or chained array methods. Keep a direct call
   for a single simple operation.

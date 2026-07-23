@@ -28,6 +28,17 @@ A small set of custom ESLint rules.
   - Set `ignoreNestedFunctionReads: true` to skip variables whose sole runtime
     read occurs inside a nested function or closure.
 
+- `zachs-rules/prefer-inline-trivial-call-wrapper`
+
+  - Reports non-exported function declarations used at one direct callsite when
+    their body only forwards parameters and static data to a similarly named
+    function.
+  - Name similarity uses ordered camel-case, acronym, numeric, and snake-case
+    tokens. The callee must contribute at least two tokens and cover at least
+    60% of the wrapper name.
+  - Skips transformed arguments, destructured parameters, optional or dynamic
+    callees, multiple statements, indirect references, and reused helpers.
+
 - `zachs-rules/no-single-use-type-alias`
 
   - Reports non-exported type aliases referenced only once.
