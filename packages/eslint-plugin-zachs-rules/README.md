@@ -25,8 +25,11 @@ A small set of custom ESLint rules.
   - Reports local `const` variables with exactly one runtime read.
   - Skips loop bindings, explicitly annotated variables, destructuring,
     declarations without initializers, and variables with later writes.
-  - Set `ignoreNestedFunctionReads: true` to skip variables whose sole runtime
-    read occurs inside a nested function or closure.
+  - Skips reads across loops, conditional branches, short-circuiting
+    expressions, optional chains, and exception-handling regions because
+    inlining could change when or how often the initializer is evaluated.
+  - Skips reads inside nested functions and closures by default. Set
+    `ignoreNestedFunctionReads: false` to include them.
 
 - `zachs-rules/prefer-inline-trivial-call-wrapper`
 

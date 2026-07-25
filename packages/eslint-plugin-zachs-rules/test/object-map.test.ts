@@ -9,6 +9,28 @@ const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)))
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
 const ESLINT_PLUGIN = plugin as unknown as ESLint.Plugin
 
+function lintSingleUseLocalConst(
+  source: string,
+  rule: Linter.RuleEntry = "error",
+) {
+  return new ESLint({
+    cwd: root,
+    overrideConfigFile: true,
+    overrideConfig: [
+      {
+        files: ["**/*.ts"],
+        languageOptions: { parser },
+        plugins: {
+          "zachs-rules": ESLINT_PLUGIN,
+        },
+        rules: {
+          "zachs-rules/prefer-inline-single-use-local-const": rule,
+        },
+      },
+    ],
+  }).lintText(source, { filePath: "single-use-local-const.ts" })
+}
+
 test("runs zachs-rules custom rules", async () => {
   expect(
     (
@@ -213,68 +235,92 @@ test("can configure the maximum use threshold", async () => {
   ])
 })
 
-test("can ignore sole runtime reads inside nested functions", async () => {
-  const source = `
-    declare function use(value: string): string
-
-    function sameFunction(value: string, condition: boolean) {
-      const sameFunctionValue = value.trim()
-      if (condition) {
-        return sameFunctionValue
-      }
-      return ""
-    }
-
-    function arrowClosure(value: string) {
-      const arrowClosureValue = value.trim()
-      return () => use(arrowClosureValue)
-    }
-
-    function nestedFunction(value: string) {
-      const nestedFunctionValue = value.trim()
-      function readValue() {
-        return use(nestedFunctionValue)
-      }
-      return readValue
-    }
-  `
-  const lint = (source: string, rule: Linter.RuleEntry) =>
-    new ESLint({
-      cwd: root,
-      overrideConfigFile: true,
-      overrideConfig: [
-        {
-          files: ["**/*.ts"],
-          languageOptions: { parser },
-          plugins: {
-            "zachs-rules": ESLINT_PLUGIN,
-          },
-          rules: {
-            "zachs-rules/prefer-inline-single-use-local-const": rule,
-          },
-        },
-      ],
-    }).lintText(source, { filePath: "nested-functions.ts" })
-
-  const [defaultResults, ignoredResults] = await Promise.all([
-    lint(source, "error"),
-    lint(source, ["error", { ignoreNestedFunctionReads: true }]),
-  ])
-
+test("skips sole reads across execution boundaries", async () => {
   expect(
-    defaultResults.flatMap((result) =>
+    (
+      await lintSingleUseLocalConst(`
+        declare function createValue(): string
+        declare function use(value: string): void
+        declare const condition: boolean
+        declare const target: { value?: string }
+
+        function sameExecution() {
+          const direct = createValue()
+          use(direct)
+
+          const ifTest = createValue()
+          if (ifTest) use("yes")
+
+          const optionalBase = createValue()
+          optionalBase?.trim()
+
+          while (condition) {
+            const perIteration = createValue()
+            use(perIteration)
+          }
+        }
+
+        function repeated() {
+          const beforeWhile = createValue()
+          while (condition) use(beforeWhile)
+
+          const beforeFor = createValue()
+          for (; condition; use(beforeFor)) {}
+        }
+
+        function conditional() {
+          const branch = createValue()
+          if (condition) use(branch)
+
+          const logical = createValue()
+          condition && use(logical)
+
+          const ternary = createValue()
+          condition ? use(ternary) : undefined
+
+          const optionalArgument = createValue()
+          target.value?.includes(optionalArgument)
+
+          const caught = createValue()
+          try {
+            use(caught)
+          } catch {}
+        }
+
+        function captured() {
+          const closure = createValue()
+          return () => use(closure)
+        }
+      `)
+    ).flatMap((result) =>
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`arrowClosureValue` is a local const used only once. Consider inlining it.",
-    "`nestedFunctionValue` is a local const used only once. Consider inlining it.",
-    "`sameFunctionValue` is a local const used only once. Consider inlining it.",
+    "`direct` is a local const used only once. Consider inlining it.",
+    "`ifTest` is a local const used only once. Consider inlining it.",
+    "`optionalBase` is a local const used only once. Consider inlining it.",
+    "`perIteration` is a local const used only once. Consider inlining it.",
   ])
+})
+
+test("can include sole runtime reads inside nested functions", async () => {
   expect(
-    ignoredResults.flatMap((result) =>
+    (
+      await lintSingleUseLocalConst(
+        `
+        declare function use(value: string): void
+
+        function captured(value: string) {
+          const closure = value.trim()
+          return () => use(closure)
+        }
+      `,
+        ["error", { ignoreNestedFunctionReads: false }],
+      )
+    ).flatMap((result) =>
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`sameFunctionValue` is a local const used only once. Consider inlining it.",
+    "`closure` is a local const used only once. Consider inlining it.",
   ])
 })
