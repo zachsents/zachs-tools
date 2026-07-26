@@ -49,7 +49,7 @@ function isReactHookCallee(callee: TSESTree.CallExpression["callee"]) {
  * @param sourceCode - Parsed source used to inspect ancestor paths.
  */
 function getEagerlyEvaluatedDeclarator(
-  node: TSESTree.Node,
+  node: TSESTree.CallExpression,
   sourceCode: TSESLint.SourceCode,
 ) {
   const ancestors = sourceCode.getAncestors(node)
