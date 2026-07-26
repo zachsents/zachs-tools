@@ -6,6 +6,7 @@ Reusable coding guidance for agents.
 
 - `rules/general.md`
 - `rules/react.md`
+- `rules/tanstack.md`
 - `rules/convex.md`
 
 These files are the source for the `$follow-zach-coding-standards` skill bundled
