@@ -324,3 +324,42 @@ test("can include sole runtime reads inside nested functions", async () => {
     "`closure` is a local const used only once. Consider inlining it.",
   ])
 })
+
+test("skips eagerly evaluated React Hook initializers", async () => {
+  expect(
+    (
+      await lintSingleUseLocalConst(`
+        declare function consume(value: unknown): void
+        declare function transform(value: unknown): unknown
+
+        function Component() {
+          const trpc = useTRPC()
+          consume(trpc)
+
+          const project = useCurrentProject().data
+          consume(project)
+
+          const transformed = transform(useSomething())
+          consume(transformed)
+
+          const context = React.useContext(Context)
+          consume(context)
+
+          const resource = use(Promise.resolve())
+          consume(resource)
+
+          const ordinaryUsePrefix = useful()
+          consume(ordinaryUsePrefix)
+
+          const deferredCallback = () => useSomething()
+          consume(deferredCallback)
+        }
+      `)
+    ).flatMap((result) =>
+      result.messages.map((message) => message.message).toSorted(),
+    ),
+  ).toEqual([
+    "`deferredCallback` is a local const used only once. Consider inlining it.",
+    "`ordinaryUsePrefix` is a local const used only once. Consider inlining it.",
+  ])
+})

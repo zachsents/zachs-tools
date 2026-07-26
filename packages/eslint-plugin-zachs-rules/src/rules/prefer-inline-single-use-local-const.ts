@@ -16,6 +16,66 @@ import {
 const SHORT_CIRCUIT_ASSIGNMENT_OPERATORS = new Set(["&&=", "||=", "??="])
 
 /**
+ * Check whether a name follows React's Hook naming convention.
+ *
+ * @param name - Identifier name to inspect.
+ */
+function isReactHookName(name: string) {
+  return name === "use" || /^use[A-Z0-9]/.test(name)
+}
+
+/**
+ * Check whether a call target uses React's direct or namespaced Hook syntax.
+ *
+ * @param callee - Call expression target to inspect.
+ */
+function isReactHookCallee(callee: TSESTree.CallExpression["callee"]) {
+  return (
+    (callee.type === AST_NODE_TYPES.Identifier &&
+      isReactHookName(callee.name)) ||
+    (callee.type === AST_NODE_TYPES.MemberExpression &&
+      !callee.computed &&
+      callee.object.type === AST_NODE_TYPES.Identifier &&
+      /^[A-Z]/.test(callee.object.name) &&
+      callee.property.type === AST_NODE_TYPES.Identifier &&
+      isReactHookName(callee.property.name))
+  )
+}
+
+/**
+ * Find the variable declarator whose initializer eagerly evaluates a node.
+ *
+ * @param node - Descendant node evaluated during traversal.
+ * @param sourceCode - Parsed source used to inspect ancestor paths.
+ */
+function getEagerlyEvaluatedDeclarator(
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+) {
+  const ancestors = sourceCode.getAncestors(node)
+
+  for (let index = ancestors.length - 1; index >= 0; index -= 1) {
+    const ancestor = ancestors[index]
+
+    if (!ancestor) continue
+
+    if (ancestor.type === AST_NODE_TYPES.VariableDeclarator) return ancestor
+
+    if (
+      ancestor.type === AST_NODE_TYPES.ArrowFunctionExpression ||
+      ancestor.type === AST_NODE_TYPES.FunctionExpression ||
+      ancestor.type === AST_NODE_TYPES.FunctionDeclaration ||
+      ancestor.type === AST_NODE_TYPES.ClassExpression ||
+      ancestor.type === AST_NODE_TYPES.ClassDeclaration
+    ) {
+      return undefined
+    }
+  }
+
+  return undefined
+}
+
+/**
  * Check whether moving an initializer to its sole read could change when or how
  * often it is evaluated.
  *
@@ -117,7 +177,20 @@ export default createRule<
   },
   defaultOptions: [{ ignoreNestedFunctionReads: true }],
   create(context, [options]) {
+    const reactHookInitializers = new WeakSet<TSESTree.VariableDeclarator>()
+
     return {
+      CallExpression(node) {
+        if (!isReactHookCallee(node.callee)) return
+
+        const declarator = getEagerlyEvaluatedDeclarator(
+          node,
+          context.sourceCode,
+        )
+
+        if (declarator) reactHookInitializers.add(declarator)
+      },
+
       "Program:exit"() {
         const globalScope = context.sourceCode.scopeManager?.globalScope
 
@@ -132,6 +205,7 @@ export default createRule<
               isModuleLevel(definition) ||
               isLoopVariable(definition) ||
               definition.node.id.typeAnnotation ||
+              reactHookInitializers.has(definition.node) ||
               hasNonInitializerWrite(variable)
             ) {
               continue
