@@ -55,6 +55,8 @@ callback or a type-safe property/dot path on the base helper name, such as
   `mapValues` with awaited values, or pass `{ concurrency }` to limit parallel
   mapper calls.
 - `merge` - Shallow merge two objects. Like `{ ...destination, ...source }`.
+- `toRecord` - Convert an entry iterable, iterator, or non-iterable value
+  exposing `entries()` into a record. Like `Object.fromEntries(entries)`.
 
 ### Matching and Zipping
 
