@@ -73,4 +73,7 @@ declare function consumeJsonRpcMessage(message: JsonRpcMessage): void
 type UsedTwice = string
 declare function consumeTwice(message: UsedTwice): UsedTwice
 
+type RecursiveRequirement = string | { requirements: RecursiveRequirement[] }
+declare function consumeRecursive(requirement: RecursiveRequirement): void
+
 export type ExportedType = string

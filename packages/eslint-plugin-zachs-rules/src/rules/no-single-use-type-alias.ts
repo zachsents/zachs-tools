@@ -38,14 +38,17 @@ export default createRule<[], "singleUseTypeAlias">({
 
             if (!definition) continue
 
+            const typeReferences = variable.references.filter(
+              (reference) => reference.isTypeReference,
+            )
+
             if (
-              variable.references.filter(
-                (reference) =>
-                  reference.isTypeReference &&
-                  !context.sourceCode
-                    .getAncestors(reference.identifier)
-                    .includes(definition.node),
-              ).length !== 1
+              typeReferences.some((reference) =>
+                context.sourceCode
+                  .getAncestors(reference.identifier)
+                  .includes(definition.node),
+              ) ||
+              typeReferences.length !== 1
             ) {
               continue
             }
