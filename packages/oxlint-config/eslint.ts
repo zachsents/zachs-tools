@@ -1,4 +1,5 @@
 import type { ESLint } from "eslint"
+import stylisticPlugin from "@stylistic/eslint-plugin"
 import parser from "@typescript-eslint/parser"
 import { defineConfig } from "eslint/config"
 import zachsRules from "eslint-plugin-zachs-rules"
@@ -14,18 +15,23 @@ export default defineConfig([
       },
     },
     plugins: {
+      "@stylistic": stylisticPlugin,
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
       "zachs-rules": zachsRules as unknown as ESLint.Plugin,
     },
     rules: {
-      "lines-around-comment": [
+      "@stylistic/lines-around-comment": [
         "error",
         {
           beforeBlockComment: true,
           allowArrayStart: true,
           allowBlockStart: true,
           allowClassStart: true,
+          allowEnumStart: true,
+          allowInterfaceStart: true,
+          allowModuleStart: true,
           allowObjectStart: true,
+          allowTypeStart: true,
         },
       ],
       "zachs-rules/no-overly-broad-parameters": "error",
