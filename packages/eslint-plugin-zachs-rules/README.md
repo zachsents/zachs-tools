@@ -44,6 +44,8 @@ information.
 - `zachs-rules/no-single-use-type-alias`
 
   - Reports non-exported type aliases referenced only once.
+  - Skips documented aliases, whose comments make the intentional abstraction
+    explicit.
 
 - `zachs-rules/prefer-object-spread-for-exact-object-map`
 

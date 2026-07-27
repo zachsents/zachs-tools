@@ -43,6 +43,8 @@ export default createRule<[], "singleUseTypeAlias">({
             )
 
             if (
+              context.sourceCode.getCommentsBefore(definition.node).length >
+                0 ||
               typeReferences.some((reference) =>
                 context.sourceCode
                   .getAncestors(reference.identifier)

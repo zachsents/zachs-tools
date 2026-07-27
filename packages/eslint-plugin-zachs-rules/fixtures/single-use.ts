@@ -70,6 +70,10 @@ const jsonRpcMessageSchema = getValue()
 type JsonRpcMessage = typeof jsonRpcMessageSchema
 declare function consumeJsonRpcMessage(message: JsonRpcMessage): void
 
+/** Preserves a meaningful domain name even though the alias has one consumer. */
+type DocumentedMessage = string
+declare function consumeDocumentedMessage(message: DocumentedMessage): void
+
 type UsedTwice = string
 declare function consumeTwice(message: UsedTwice): UsedTwice
 
