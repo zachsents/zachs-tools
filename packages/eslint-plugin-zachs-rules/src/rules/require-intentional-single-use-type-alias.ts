@@ -1,18 +1,19 @@
 import { AST_NODE_TYPES, TSESLint } from "@typescript-eslint/utils"
 import { createRule } from "../shared/create-rule"
-import { visitScopes } from "../shared/scope-variables"
+import { hasLeadingJSDocComment, visitScopes } from "../shared/scope-variables"
 
-export default createRule<[], "singleUseTypeAlias">({
-  name: "no-single-use-type-alias",
+export default createRule<[], "unintentionalSingleUseTypeAlias">({
+  name: "require-intentional-single-use-type-alias",
   meta: {
     type: "suggestion",
     docs: {
-      description: "Report type aliases referenced only once",
+      description:
+        "Require type aliases referenced only once to be inlined or intentionally documented",
     },
     schema: [],
     messages: {
-      singleUseTypeAlias:
-        "`{{name}}` is a type alias used only once. Consider inlining it.",
+      unintentionalSingleUseTypeAlias:
+        "`{{name}}` is a type alias used only once. Consider inlining it. If the named abstraction is intentional, add JSDoc.",
     },
   },
   defaultOptions: [],
@@ -43,8 +44,7 @@ export default createRule<[], "singleUseTypeAlias">({
             )
 
             if (
-              context.sourceCode.getCommentsBefore(definition.node).length >
-                0 ||
+              hasLeadingJSDocComment(definition.node, context.sourceCode) ||
               typeReferences.some((reference) =>
                 context.sourceCode
                   .getAncestors(reference.identifier)
@@ -57,7 +57,7 @@ export default createRule<[], "singleUseTypeAlias">({
 
             context.report({
               node: definition.name,
-              messageId: "singleUseTypeAlias",
+              messageId: "unintentionalSingleUseTypeAlias",
               data: { name: variable.name },
             })
           }

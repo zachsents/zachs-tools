@@ -72,17 +72,17 @@ test("reports ordered name overlap for direct and member calls", async () => {
     {
       ruleId: "zachs-rules/prefer-inline-trivial-call-wrapper",
       message:
-        "`enqueueDeploymentPlanJob` only specializes and forwards a call to `enqueueDeploymentJob`. Consider calling `enqueueDeploymentJob` directly.",
+        "`enqueueDeploymentPlanJob` only specializes and forwards a call to `enqueueDeploymentJob`. Consider calling `enqueueDeploymentJob` directly. If the adapter is intentional, keep it with a described disable directive.",
     },
     {
       ruleId: "zachs-rules/prefer-inline-trivial-call-wrapper",
       message:
-        "`loadHTTPUserProfile` only specializes and forwards a call to `loadHTTPUser`. Consider calling `loadHTTPUser` directly.",
+        "`loadHTTPUserProfile` only specializes and forwards a call to `loadHTTPUser`. Consider calling `loadHTTPUser` directly. If the adapter is intentional, keep it with a described disable directive.",
     },
     {
       ruleId: "zachs-rules/prefer-inline-trivial-call-wrapper",
       message:
-        "`sync_user_2_cache` only specializes and forwards a call to `sync_user_cache`. Consider calling `sync_user_cache` directly.",
+        "`sync_user_2_cache` only specializes and forwards a call to `sync_user_cache`. Consider calling `sync_user_cache` directly. If the adapter is intentional, keep it with a described disable directive.",
     },
   ])
 })
@@ -107,7 +107,7 @@ test("uses a 60 percent ordered token threshold", async () => {
     {
       ruleId: "zachs-rules/prefer-inline-trivial-call-wrapper",
       message:
-        "`createUrgentDeploymentRetryJob` only specializes and forwards a call to `createDeploymentJob`. Consider calling `createDeploymentJob` directly.",
+        "`createUrgentDeploymentRetryJob` only specializes and forwards a call to `createDeploymentJob`. Consider calling `createDeploymentJob` directly. If the adapter is intentional, keep it with a described disable directive.",
     },
   ])
 })

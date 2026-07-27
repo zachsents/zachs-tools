@@ -33,14 +33,14 @@ function lintSingleUseLocalConst(
           "zachs-rules": ESLINT_PLUGIN,
         },
         rules: {
-          "zachs-rules/prefer-inline-single-use-local-const": rule,
+          "zachs-rules/require-intentional-single-use-local-const": rule,
         },
       },
     ],
   }).lintText(source, { filePath: "single-use-local-const.ts" })
 }
 
-test("runs zachs-rules custom rules", async () => {
+test("runs intentionality rules", async () => {
   expect(
     (
       await new ESLint({
@@ -54,11 +54,9 @@ test("runs zachs-rules custom rules", async () => {
               "zachs-rules": ESLINT_PLUGIN,
             },
             rules: {
-              "zachs-rules/no-single-use-type-alias": "error",
-              "zachs-rules/prefer-inline-module-const": "error",
-              "zachs-rules/prefer-inline-single-use-local-const": "error",
-              "zachs-rules/prefer-object-spread-for-exact-object-map": "error",
-              "zachs-rules/prefer-pick-for-object-subset-map": "error",
+              "zachs-rules/require-intentional-module-const": "error",
+              "zachs-rules/require-intentional-single-use-local-const": "error",
+              "zachs-rules/require-intentional-single-use-type-alias": "error",
             },
           },
         ],
@@ -87,57 +85,45 @@ test("runs zachs-rules custom rules", async () => {
       ),
   ).toEqual([
     {
-      file: "fixtures/pick.ts",
-      ruleId: "zachs-rules/no-single-use-type-alias",
+      file: "fixtures/single-use.ts",
+      ruleId: "zachs-rules/require-intentional-module-const",
       message:
-        "`Deployment` is a type alias used only once. Consider inlining it.",
-    },
-    {
-      file: "fixtures/pick.ts",
-      ruleId: "zachs-rules/prefer-pick-for-object-subset-map",
-      message:
-        '`deployment` is remapped by 4 identical property names but has other known properties. Prefer `pick(deployment, ["createdAt", "id", "projectId", "status"])` or equivalent.',
+        "`blockCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/no-single-use-type-alias",
+      ruleId: "zachs-rules/require-intentional-module-const",
       message:
-        "`JsonRpcMessage` is a type alias used only once. Consider inlining it.",
+        "`lineCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/prefer-inline-module-const",
+      ruleId: "zachs-rules/require-intentional-module-const",
       message:
-        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
+        "`once` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
     },
     {
       file: "fixtures/single-use.ts",
-      ruleId: "zachs-rules/prefer-inline-single-use-local-const",
+      ruleId: "zachs-rules/require-intentional-single-use-local-const",
       message:
-        "`scopedOnce` is a local const used only once. Consider inlining it.",
+        "`scopedOnce` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
     },
     {
-      file: "fixtures/spread.ts",
-      ruleId: "zachs-rules/no-single-use-type-alias",
+      file: "fixtures/single-use.ts",
+      ruleId: "zachs-rules/require-intentional-single-use-type-alias",
       message:
-        "`DeploymentSummary` is a type alias used only once. Consider inlining it.",
+        "`JsonRpcMessage` is a type alias used only once. Consider inlining it. If the named abstraction is intentional, add JSDoc.",
     },
     {
-      file: "fixtures/spread.ts",
-      ruleId: "zachs-rules/prefer-object-spread-for-exact-object-map",
+      file: "fixtures/single-use.ts",
+      ruleId: "zachs-rules/require-intentional-single-use-type-alias",
       message:
-        "`deployment` is remapped by identical property names for all of its known properties. Prefer `{ ...deployment }`.",
-    },
-    {
-      file: "fixtures/valid.ts",
-      ruleId: "zachs-rules/no-single-use-type-alias",
-      message:
-        "`UnknownDeployment` is a type alias used only once. Consider inlining it.",
+        "`LineCommentedMessage` is a type alias used only once. Consider inlining it. If the named abstraction is intentional, add JSDoc.",
     },
   ])
 })
 
-test("module const rule skips prominent names, functions, comments, and type-only uses", async () => {
+test("module const rule skips prominent names, functions, JSDoc, and type-only uses", async () => {
   expect(
     (
       await new ESLint({
@@ -151,7 +137,7 @@ test("module const rule skips prominent names, functions, comments, and type-onl
               "zachs-rules": ESLINT_PLUGIN,
             },
             rules: {
-              "zachs-rules/prefer-inline-module-const": "error",
+              "zachs-rules/require-intentional-module-const": "error",
             },
           },
         ],
@@ -160,13 +146,15 @@ test("module const rule skips prominent names, functions, comments, and type-onl
       result.messages
         .filter(
           (message) =>
-            message.ruleId === "zachs-rules/prefer-inline-module-const",
+            message.ruleId === "zachs-rules/require-intentional-module-const",
         )
         .map((message) => message.message)
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`blockCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
+    "`lineCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
   ])
 })
 
@@ -184,7 +172,7 @@ test("can configure the maximum use threshold", async () => {
               "zachs-rules": ESLINT_PLUGIN,
             },
             rules: {
-              "zachs-rules/prefer-inline-module-const": [
+              "zachs-rules/require-intentional-module-const": [
                 "error",
                 { maxUses: 2 },
               ],
@@ -196,14 +184,16 @@ test("can configure the maximum use threshold", async () => {
       result.messages
         .filter(
           (message) =>
-            message.ruleId === "zachs-rules/prefer-inline-module-const",
+            message.ruleId === "zachs-rules/require-intentional-module-const",
         )
         .map((message) => message.message)
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
-    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`blockCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
+    "`lineCommented` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
+    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
   ])
 })
 
@@ -268,10 +258,10 @@ test("skips sole reads across execution boundaries", async () => {
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`direct` is a local const used only once. Consider inlining it.",
-    "`ifTest` is a local const used only once. Consider inlining it.",
-    "`optionalBase` is a local const used only once. Consider inlining it.",
-    "`perIteration` is a local const used only once. Consider inlining it.",
+    "`direct` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
+    "`ifTest` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
+    "`optionalBase` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
+    "`perIteration` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
   ])
 })
 
@@ -293,7 +283,7 @@ test("can include sole runtime reads inside nested functions", async () => {
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`closure` is a local const used only once. Consider inlining it.",
+    "`closure` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
   ])
 })
 
@@ -331,6 +321,6 @@ test("skips eagerly evaluated React Hook initializers", async () => {
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`ordinaryUsePrefix` is a local const used only once. Consider inlining it.",
+    "`ordinaryUsePrefix` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
   ])
 })

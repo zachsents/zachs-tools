@@ -36,6 +36,12 @@ export function run(input: string) {
   return scopedOnce
 }
 
+export function explainedLocal(input: string) {
+  // The name makes the normalization step explicit.
+  const normalized = input.trim()
+  return normalized
+}
+
 export function useTwice(input: string) {
   const uri = input.trim()
   console.log(uri)
@@ -73,6 +79,12 @@ declare function consumeJsonRpcMessage(message: JsonRpcMessage): void
 /** Preserves a meaningful domain name even though the alias has one consumer. */
 type DocumentedMessage = string
 declare function consumeDocumentedMessage(message: DocumentedMessage): void
+
+// An ordinary comment does not document a type abstraction.
+type LineCommentedMessage = string
+declare function consumeLineCommentedMessage(
+  message: LineCommentedMessage,
+): void
 
 type UsedTwice = string
 declare function consumeTwice(message: UsedTwice): UsedTwice

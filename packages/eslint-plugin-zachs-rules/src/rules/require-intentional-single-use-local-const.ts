@@ -8,6 +8,7 @@ import { createRule } from "../shared/create-rule"
 import {
   getConstDefinition,
   getRuntimeReadReferences,
+  hasLeadingComment,
   hasNonInitializerWrite,
   isLoopVariable,
   isModuleLevel,
@@ -153,13 +154,14 @@ function isReadAcrossExecutionBoundary(
 
 export default createRule<
   [{ ignoreNestedFunctionReads?: boolean }?],
-  "preferInlineSingleUseLocalConst"
+  "unintentionalSingleUseLocalConst"
 >({
-  name: "prefer-inline-single-use-local-const",
+  name: "require-intentional-single-use-local-const",
   meta: {
     type: "suggestion",
     docs: {
-      description: "Prefer inlining local const variables read only once",
+      description:
+        "Require local constants read only once to be inlined or intentionally documented",
     },
     schema: [
       {
@@ -173,8 +175,8 @@ export default createRule<
       },
     ],
     messages: {
-      preferInlineSingleUseLocalConst:
-        "`{{name}}` is a local const used only once. Consider inlining it.",
+      unintentionalSingleUseLocalConst:
+        "`{{name}}` is a local const used only once. Consider inlining it. If the name, evaluation order, or initialization behavior is intentional, add a comment.",
     },
   },
   defaultOptions: [{ ignoreNestedFunctionReads: true }],
@@ -207,6 +209,7 @@ export default createRule<
               !definition ||
               isModuleLevel(definition) ||
               isLoopVariable(definition) ||
+              hasLeadingComment(definition, context.sourceCode) ||
               definition.node.id.typeAnnotation ||
               reactHookInitializers.has(definition.node) ||
               hasCallSignature(services, definition.name) ||
@@ -237,7 +240,7 @@ export default createRule<
 
             context.report({
               node: definition.name,
-              messageId: "preferInlineSingleUseLocalConst",
+              messageId: "unintentionalSingleUseLocalConst",
               data: { name: variable.name },
             })
           }

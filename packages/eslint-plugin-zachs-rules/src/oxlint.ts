@@ -16,7 +16,7 @@ export default {
         },
         messages: {
           missingDescription:
-            "Disable directive should include a description after `--`.",
+            "Disable directive should explain why the exception is intentional after `--`.",
         },
       },
       create(context) {

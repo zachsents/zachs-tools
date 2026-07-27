@@ -34,14 +34,12 @@ export default defineConfig([
           allowTypeStart: true,
         },
       ],
-      "zachs-rules/no-single-use-type-alias": "error",
-      "zachs-rules/prefer-inline-module-const": ["error", { maxUses: 3 }],
-      "zachs-rules/prefer-inline-single-use-local-const": [
+      "zachs-rules/require-intentional-module-const": ["error", { maxUses: 3 }],
+      "zachs-rules/require-intentional-single-use-local-const": [
         "error",
         { ignoreNestedFunctionReads: true },
       ],
-      "zachs-rules/prefer-object-spread-for-exact-object-map": "error",
-      "zachs-rules/prefer-pick-for-object-subset-map": "error",
+      "zachs-rules/require-intentional-single-use-type-alias": "error",
     },
   },
 ])

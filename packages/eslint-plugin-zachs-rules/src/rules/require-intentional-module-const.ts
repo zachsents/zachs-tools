@@ -3,7 +3,7 @@ import { createRule } from "../shared/create-rule"
 import {
   getConstDefinition,
   getRuntimeReadReferences,
-  hasLeadingComment,
+  hasLeadingJSDocComment,
   hasNonInitializerWrite,
   isExported,
   isModuleLevel,
@@ -20,13 +20,13 @@ function isProminentConstantName(name: string) {
   return /^[A-Z][A-Z0-9_]*$/u.test(name) || /^[A-Z][A-Za-z0-9]*$/u.test(name)
 }
 
-export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
-  name: "prefer-inline-module-const",
+export default createRule<[{ maxUses?: number }?], "unintentionalModuleConst">({
+  name: "require-intentional-module-const",
   meta: {
     type: "suggestion",
     docs: {
       description:
-        "Prefer inlining lightly reused module constants unless their significance is explicit",
+        "Require lightly reused module constants to be inlined or made intentionally prominent",
     },
     schema: [
       {
@@ -41,8 +41,8 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
       },
     ],
     messages: {
-      preferInlineModuleConst:
-        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
+      unintentionalModuleConst:
+        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it. If its name or initialization behavior is intentional, add JSDoc or use a SCREAMING_SNAKE_CASE or PascalCase name.",
     },
   },
   defaultOptions: [{ maxUses: 1 }],
@@ -64,7 +64,7 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
               !isModuleLevel(definition) ||
               isExported(definition) ||
               isProminentConstantName(variable.name) ||
-              hasLeadingComment(definition, context.sourceCode) ||
+              hasLeadingJSDocComment(definition.parent, context.sourceCode) ||
               hasCallSignature(services, definition.name) ||
               hasNonInitializerWrite(variable)
             ) {
@@ -85,7 +85,7 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
 
             context.report({
               node: definition.name,
-              messageId: "preferInlineModuleConst",
+              messageId: "unintentionalModuleConst",
               data: {
                 name: variable.name,
                 useCount:

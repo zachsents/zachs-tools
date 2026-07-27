@@ -223,7 +223,7 @@ export default createRule<[], "preferInlineTrivialCallWrapper">({
     schema: [],
     messages: {
       preferInlineTrivialCallWrapper:
-        "`{{wrapperName}}` only specializes and forwards a call to `{{calleeName}}`. Consider calling `{{calleeName}}` directly.",
+        "`{{wrapperName}}` only specializes and forwards a call to `{{calleeName}}`. Consider calling `{{calleeName}}` directly. If the adapter is intentional, keep it with a described disable directive.",
     },
   },
   defaultOptions: [],

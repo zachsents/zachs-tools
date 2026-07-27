@@ -10,20 +10,20 @@ The rules that inspect TypeScript types run through the companion ESLint config
 because Oxlint's JavaScript plugin API does not expose semantic type
 information.
 
-- `zachs-rules/prefer-inline-module-const`
+- `zachs-rules/require-intentional-module-const`
 
   - Reports module-level `const` variables with one to `maxUses` runtime reads.
   - Skips exports, SCREAMING_SNAKE_CASE and PascalCase names, function-valued
-    constants, documented declarations, destructuring, `declare const`, and
+    constants, JSDoc-documented declarations, destructuring, `declare const`, and
     variables with non-initializer writes.
   - Type-only references such as `z.infer<typeof schema>` do not count as uses.
 
-- `zachs-rules/prefer-inline-single-use-local-const`
+- `zachs-rules/require-intentional-single-use-local-const`
 
   - Reports local `const` variables with exactly one runtime read.
   - Skips loop bindings, explicitly annotated variables, function-valued
-    constants, destructuring, declarations without initializers, and variables
-    with later writes.
+    constants, commented declarations, destructuring, declarations without
+    initializers, and variables with later writes.
   - Skips reads across loops, conditional branches, short-circuiting
     expressions, optional chains, and exception-handling regions because
     inlining could change when or how often the initializer is evaluated.
@@ -41,27 +41,10 @@ information.
   - Skips transformed arguments, destructured parameters, optional or dynamic
     callees, multiple statements, indirect references, and reused helpers.
 
-- `zachs-rules/no-single-use-type-alias`
+- `zachs-rules/require-intentional-single-use-type-alias`
 
   - Reports non-exported type aliases referenced only once.
-  - Skips documented aliases, whose comments make the intentional abstraction
-    explicit.
-
-- `zachs-rules/prefer-object-spread-for-exact-object-map`
-
-  - Reports repeated same-name property maps when TypeScript proves the mapped
-    keys exactly match the source object's known properties.
-  - Recommendation: `{ ...deployment }`.
-
-- `zachs-rules/prefer-pick-for-object-subset-map`
-  - Reports repeated same-name property maps when TypeScript proves the mapped
-    keys are a subset of the source object's known properties, or the source has
-    an index signature.
-  - Recommendation: `pick(deployment, ["createdAt", "id", "projectId", "status"])`.
-
-The object-map rules intentionally skip renamed properties, computed
-properties, already-spread objects, single-property mappings, unions, and
-unknown-like source types.
+  - Skips exported, recursive, reused, and JSDoc-documented aliases.
 
 - `zachs-rules/require-disable-directive-description`
   - Reports disable directives recognized by oxlint that do not include a

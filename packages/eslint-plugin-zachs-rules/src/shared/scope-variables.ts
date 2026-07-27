@@ -1,4 +1,8 @@
-import { AST_NODE_TYPES, TSESLint } from "@typescript-eslint/utils"
+import {
+  AST_NODE_TYPES,
+  TSESLint,
+  type TSESTree,
+} from "@typescript-eslint/utils"
 
 type VariableDefinition = TSESLint.Scope.Definitions.VariableDefinition
 
@@ -115,6 +119,21 @@ export function hasLeadingComment(
   sourceCode: TSESLint.SourceCode,
 ) {
   return sourceCode.getCommentsBefore(definition.parent).length > 0
+}
+
+/**
+ * Check whether a declaration has an attached leading JSDoc comment.
+ *
+ * @param node - Declaration node to inspect.
+ * @param sourceCode - Parsed source used to read leading comments.
+ */
+export function hasLeadingJSDocComment(
+  node: TSESTree.Node,
+  sourceCode: TSESLint.SourceCode,
+) {
+  const comment = sourceCode.getCommentsBefore(node).at(-1)
+
+  return comment ? sourceCode.getText(comment).startsWith("/**") : false
 }
 
 /**
