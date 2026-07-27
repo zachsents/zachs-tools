@@ -48,11 +48,6 @@ export default defineConfig({
     "jsdoc-js/require-throws-description": "error",
     "jsdoc-js/require-yields": "error",
     "jsdoc-js/require-yields-description": "error",
-    "zachs-rules/prefer-inline-module-const": ["error", { maxUses: 3 }],
-    "zachs-rules/prefer-inline-single-use-local-const": [
-      "error",
-      { ignoreNestedFunctionReads: true },
-    ],
     "zachs-rules/prefer-inline-trivial-call-wrapper": "warn",
     "zachs-rules/require-disable-directive-description": "error",
     "typescript/consistent-return": "off",

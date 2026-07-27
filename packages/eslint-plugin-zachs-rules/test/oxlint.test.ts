@@ -102,10 +102,8 @@ test("allows described disable directives and enable directives", () => {
   ).toEqual([])
 })
 
-test("exports every Oxlint-compatible rule", () => {
+test("exports every non-type-aware Oxlint-compatible rule", () => {
   expect(Object.keys(oxlintPlugin.rules).toSorted()).toEqual([
-    "prefer-inline-module-const",
-    "prefer-inline-single-use-local-const",
     "prefer-inline-trivial-call-wrapper",
     "require-disable-directive-description",
   ])

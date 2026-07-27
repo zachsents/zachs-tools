@@ -1,5 +1,6 @@
 import {
   AST_NODE_TYPES,
+  ESLintUtils,
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"
@@ -12,6 +13,7 @@ import {
   isModuleLevel,
   visitScopes,
 } from "../shared/scope-variables"
+import { hasCallSignature } from "../shared/type-shape"
 
 const SHORT_CIRCUIT_ASSIGNMENT_OPERATORS = new Set(["&&=", "||=", "??="])
 
@@ -177,6 +179,7 @@ export default createRule<
   },
   defaultOptions: [{ ignoreNestedFunctionReads: true }],
   create(context, [options]) {
+    const services = ESLintUtils.getParserServices(context)
     const reactHookInitializers = new WeakSet<TSESTree.VariableDeclarator>()
 
     return {
@@ -206,6 +209,7 @@ export default createRule<
               isLoopVariable(definition) ||
               definition.node.id.typeAnnotation ||
               reactHookInitializers.has(definition.node) ||
+              hasCallSignature(services, definition.name) ||
               hasNonInitializerWrite(variable)
             ) {
               continue

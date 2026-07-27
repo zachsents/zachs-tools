@@ -13,4 +13,12 @@ export default defineConfig([
     ],
   },
   baseConfig,
+  {
+    name: "zachs-tools/scripts",
+    files: ["scripts/**/*.ts"],
+    rules: {
+      // REVIEW: CLI scripts intentionally use module scope as their execution scope.
+      "zachs-rules/prefer-inline-module-const": "off",
+    },
+  },
 ])

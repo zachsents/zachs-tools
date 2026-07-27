@@ -1,3 +1,4 @@
+import { ESLintUtils } from "@typescript-eslint/utils"
 import { createRule } from "../shared/create-rule"
 import {
   getConstDefinition,
@@ -8,14 +9,15 @@ import {
   isModuleLevel,
   visitScopes,
 } from "../shared/scope-variables"
+import { hasCallSignature } from "../shared/type-shape"
 
 /**
- * Check whether a name uses screaming-snake-case syntax.
+ * Check whether a module constant uses an intentionally prominent name.
  *
  * @param name - Identifier to inspect.
  */
-function isConstantCase(name: string) {
-  return /^[A-Z][A-Z0-9_]*$/u.test(name)
+function isProminentConstantName(name: string) {
+  return /^[A-Z][A-Z0-9_]*$/u.test(name) || /^[A-Z][A-Za-z0-9]*$/u.test(name)
 }
 
 export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
@@ -40,11 +42,13 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
     ],
     messages: {
       preferInlineModuleConst:
-        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
+        "`{{name}}` is a module-level const with only {{useCount}}. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
     },
   },
   defaultOptions: [{ maxUses: 1 }],
   create(context, [options]) {
+    const services = ESLintUtils.getParserServices(context)
+
     return {
       "Program:exit"() {
         const globalScope = context.sourceCode.scopeManager?.globalScope
@@ -59,8 +63,9 @@ export default createRule<[{ maxUses?: number }?], "preferInlineModuleConst">({
               !definition ||
               !isModuleLevel(definition) ||
               isExported(definition) ||
-              isConstantCase(variable.name) ||
+              isProminentConstantName(variable.name) ||
               hasLeadingComment(definition, context.sourceCode) ||
+              hasCallSignature(services, definition.name) ||
               hasNonInitializerWrite(variable)
             ) {
               continue

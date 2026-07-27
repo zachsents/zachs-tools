@@ -8,6 +8,15 @@ import plugin from "../src/index"
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)))
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- @typescript-eslint rule modules are runtime-compatible with ESLint plugin objects, but their generic rule types do not line up exactly.
 const ESLINT_PLUGIN = plugin as unknown as ESLint.Plugin
+const TYPE_AWARE_LANGUAGE_OPTIONS = {
+  parser,
+  parserOptions: {
+    projectService: {
+      allowDefaultProject: ["single-use-local-const.ts"],
+    },
+    tsconfigRootDir: root,
+  },
+}
 
 function lintSingleUseLocalConst(
   source: string,
@@ -19,7 +28,7 @@ function lintSingleUseLocalConst(
     overrideConfig: [
       {
         files: ["**/*.ts"],
-        languageOptions: { parser },
+        languageOptions: TYPE_AWARE_LANGUAGE_OPTIONS,
         plugins: {
           "zachs-rules": ESLINT_PLUGIN,
         },
@@ -40,13 +49,7 @@ test("runs zachs-rules custom rules", async () => {
         overrideConfig: [
           {
             files: ["fixtures/**/*.ts"],
-            languageOptions: {
-              parser,
-              parserOptions: {
-                projectService: true,
-                tsconfigRootDir: root,
-              },
-            },
+            languageOptions: TYPE_AWARE_LANGUAGE_OPTIONS,
             plugins: {
               "zachs-rules": ESLINT_PLUGIN,
             },
@@ -124,7 +127,7 @@ test("runs zachs-rules custom rules", async () => {
       file: "fixtures/single-use.ts",
       ruleId: "zachs-rules/prefer-inline-module-const",
       message:
-        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
+        "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
     },
     {
       file: "fixtures/single-use.ts",
@@ -153,7 +156,7 @@ test("runs zachs-rules custom rules", async () => {
   ])
 })
 
-test("module const rule skips commented, constant-case, and type-only uses", async () => {
+test("module const rule skips prominent names, functions, comments, and type-only uses", async () => {
   expect(
     (
       await new ESLint({
@@ -162,13 +165,7 @@ test("module const rule skips commented, constant-case, and type-only uses", asy
         overrideConfig: [
           {
             files: ["fixtures/single-use.ts"],
-            languageOptions: {
-              parser,
-              parserOptions: {
-                projectService: true,
-                tsconfigRootDir: root,
-              },
-            },
+            languageOptions: TYPE_AWARE_LANGUAGE_OPTIONS,
             plugins: {
               "zachs-rules": ESLINT_PLUGIN,
             },
@@ -188,7 +185,7 @@ test("module const rule skips commented, constant-case, and type-only uses", asy
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
   ])
 })
 
@@ -201,13 +198,7 @@ test("can configure the maximum use threshold", async () => {
         overrideConfig: [
           {
             files: ["fixtures/single-use.ts"],
-            languageOptions: {
-              parser,
-              parserOptions: {
-                projectService: true,
-                tsconfigRootDir: root,
-              },
-            },
+            languageOptions: TYPE_AWARE_LANGUAGE_OPTIONS,
             plugins: {
               "zachs-rules": ESLINT_PLUGIN,
             },
@@ -230,8 +221,8 @@ test("can configure the maximum use threshold", async () => {
         .toSorted(),
     ),
   ).toEqual([
-    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
-    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`once` is a module-level const with only one runtime use. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
+    "`twice` is a module-level const with only 2 runtime uses. Consider inlining it, using a SCREAMING_SNAKE_CASE or PascalCase name, or leaving a descriptive comment if it is intentionally named for readability.",
   ])
 })
 
@@ -359,7 +350,6 @@ test("skips eagerly evaluated React Hook initializers", async () => {
       result.messages.map((message) => message.message).toSorted(),
     ),
   ).toEqual([
-    "`deferredCallback` is a local const used only once. Consider inlining it.",
     "`ordinaryUsePrefix` is a local const used only once. Consider inlining it.",
   ])
 })

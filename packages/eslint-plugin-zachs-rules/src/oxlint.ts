@@ -1,6 +1,4 @@
 import { defineRule } from "@oxlint/plugins"
-import preferInlineModuleConst from "./rules/prefer-inline-module-const"
-import preferInlineSingleUseLocalConst from "./rules/prefer-inline-single-use-local-const"
 import preferInlineTrivialCallWrapper from "./rules/prefer-inline-trivial-call-wrapper"
 
 export default {
@@ -8,8 +6,6 @@ export default {
     name: "zachs-rules",
   },
   rules: {
-    "prefer-inline-module-const": preferInlineModuleConst,
-    "prefer-inline-single-use-local-const": preferInlineSingleUseLocalConst,
     "prefer-inline-trivial-call-wrapper": preferInlineTrivialCallWrapper,
     "require-disable-directive-description": defineRule({
       meta: {

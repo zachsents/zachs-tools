@@ -1,11 +1,19 @@
 declare function getValue(): string
 declare function getObject(): { destructured: string }
+declare function defineAccount(provider: string): (name: string) => string
 
 const once = getValue()
 console.log(once)
 
 const API_URL = getValue()
 console.log(API_URL)
+
+const AcceptedTopLevelName = getValue()
+console.log(AcceptedTopLevelName)
+
+const googleAccount = defineAccount("google")
+const WORK_GOOGLE = googleAccount("work")
+const PERSONAL_GOOGLE = googleAccount("personal")
 
 /** A documented module constant is intentionally named and retained. */
 const documented = getValue()
@@ -32,6 +40,11 @@ export function useTwice(input: string) {
   const uri = input.trim()
   console.log(uri)
   return uri
+}
+
+export function useCurriedFactory(provider: string) {
+  const account = defineAccount(provider)
+  return account("work")
 }
 
 export function explicitlyTyped(input: string) {

@@ -13,6 +13,24 @@ export type SourceShape =
     }
 
 /**
+ * Check whether an ESTree node resolves to a callable TypeScript type.
+ *
+ * @param services - Type-aware parser services for the linted program.
+ * @param node - ESTree node whose type should be inspected.
+ */
+export function hasCallSignature(
+  services: ParserServicesWithTypeInformation,
+  node: TSESTree.Node,
+) {
+  return (
+    services.program
+      .getTypeChecker()
+      .getApparentType(services.getTypeAtLocation(node))
+      .getCallSignatures().length > 0
+  )
+}
+
+/**
  * Check whether a type cannot provide a stable property shape.
  *
  * @param type - TypeScript type to inspect.

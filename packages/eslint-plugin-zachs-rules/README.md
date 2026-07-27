@@ -6,6 +6,10 @@ A small set of custom ESLint rules.
 
 ### ESLint and Oxlint
 
+The rules that inspect TypeScript types run through the companion ESLint config
+because Oxlint's JavaScript plugin API does not expose semantic type
+information.
+
 - `zachs-rules/no-overly-broad-parameters`
 
   - Reports explicitly typed parameters on non-exported function helpers when
@@ -16,15 +20,17 @@ A small set of custom ESLint rules.
 - `zachs-rules/prefer-inline-module-const`
 
   - Reports module-level `const` variables with one to `maxUses` runtime reads.
-  - Skips exports, SCREAMING_SNAKE_CASE names, documented declarations,
-    destructuring, `declare const`, and variables with non-initializer writes.
+  - Skips exports, SCREAMING_SNAKE_CASE and PascalCase names, function-valued
+    constants, documented declarations, destructuring, `declare const`, and
+    variables with non-initializer writes.
   - Type-only references such as `z.infer<typeof schema>` do not count as uses.
 
 - `zachs-rules/prefer-inline-single-use-local-const`
 
   - Reports local `const` variables with exactly one runtime read.
-  - Skips loop bindings, explicitly annotated variables, destructuring,
-    declarations without initializers, and variables with later writes.
+  - Skips loop bindings, explicitly annotated variables, function-valued
+    constants, destructuring, declarations without initializers, and variables
+    with later writes.
   - Skips reads across loops, conditional branches, short-circuiting
     expressions, optional chains, and exception-handling regions because
     inlining could change when or how often the initializer is evaluated.
