@@ -54,7 +54,6 @@ test("runs zachs-rules custom rules", async () => {
               "zachs-rules": ESLINT_PLUGIN,
             },
             rules: {
-              "zachs-rules/no-overly-broad-parameters": "error",
               "zachs-rules/no-single-use-type-alias": "error",
               "zachs-rules/prefer-inline-module-const": "error",
               "zachs-rules/prefer-inline-single-use-local-const": "error",
@@ -87,24 +86,6 @@ test("runs zachs-rules custom rules", async () => {
           left.message.localeCompare(right.message),
       ),
   ).toEqual([
-    {
-      file: "fixtures/overly-broad-parameters.ts",
-      ruleId: "zachs-rules/no-overly-broad-parameters",
-      message:
-        "`error` is declared as `string | Error`, but every direct call to `stringifyError` passes `Error`. Narrow the parameter type to `Error`.",
-    },
-    {
-      file: "fixtures/overly-broad-parameters.ts",
-      ruleId: "zachs-rules/no-overly-broad-parameters",
-      message:
-        "`error` is declared as `unknown`, but every direct call to `errorMessage` passes `Error`. Narrow the parameter type to `Error`.",
-    },
-    {
-      file: "fixtures/overly-broad-parameters.ts",
-      ruleId: "zachs-rules/no-overly-broad-parameters",
-      message:
-        "`error` is declared as `unknown`, but every direct call to `errorWithThis` passes `Error`. Narrow the parameter type to `Error`.",
-    },
     {
       file: "fixtures/pick.ts",
       ruleId: "zachs-rules/no-single-use-type-alias",

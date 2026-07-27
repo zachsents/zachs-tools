@@ -34,7 +34,6 @@ export default defineConfig([
           allowTypeStart: true,
         },
       ],
-      "zachs-rules/no-overly-broad-parameters": "error",
       "zachs-rules/no-single-use-type-alias": "error",
       "zachs-rules/prefer-inline-module-const": ["error", { maxUses: 3 }],
       "zachs-rules/prefer-inline-single-use-local-const": [

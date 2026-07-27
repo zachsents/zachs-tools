@@ -10,13 +10,6 @@ The rules that inspect TypeScript types run through the companion ESLint config
 because Oxlint's JavaScript plugin API does not expose semantic type
 information.
 
-- `zachs-rules/no-overly-broad-parameters`
-
-  - Reports explicitly typed parameters on non-exported function helpers when
-    every visible direct callsite accepts a common narrower type.
-  - Skips helpers that escape through a non-call reference, omitted or spread
-    arguments, overloads, incompatible callsite types, and exported functions.
-
 - `zachs-rules/prefer-inline-module-const`
 
   - Reports module-level `const` variables with one to `maxUses` runtime reads.
