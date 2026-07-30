@@ -30,17 +30,15 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --type-aware",
-    "lint:fix": "oxlint --type-aware --fix-suggestions",
-    "format": "prettier . --write",
-    "fix": "bun run typecheck && bun run lint:fix && bun run format",
+    "lint": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware\" \"bun --bun eslint .\"",
+    "lint:fix": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware --fix-suggestions\" \"bun --bun eslint . --fix\"",
     "check:fn": "./scripts/check-function.sh",
     "typecheck:file": "./scripts/typecheck-file.sh",
     "test": "bun test --concurrent",
     "build": "zshy",
-    "pack:dry": "npm pack --dry-run --json",
-    "check": "bun run typecheck && bun run lint && bun run test && bun run build && bun run pack:dry",
-    "prepublishOnly": "bun run check"
+    "pack:dry": "bun pm pack --dry-run",
+    "check": "bun run typecheck && bun run lint && bun run test",
+    "prepublishOnly": "bun run check && bun run build && bun run pack:dry"
   },
   "files": [
     "dist",
@@ -60,6 +58,11 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@zachsents/oxlint-config": "workspace:*",
+    "concurrently": "^10.0.4",
+    "eslint": "^9.39.4",
+    "oxlint": "^1.74.0",
+    "oxlint-tsgolint": "^0.24.0",
     "remeda": "^2.39.0",
     "type-fest": "^5.7.0",
     "typescript": "^6.0.3",

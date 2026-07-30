@@ -177,19 +177,9 @@ jobs:
         if: steps.release.outputs.should_publish == 'true'
         run: bun install --frozen-lockfile
 
-      - name: Check package
+      - name: Check and build package dependency graph
         if: steps.release.outputs.should_publish == 'true'
-        run: |
-          if node -e "process.exit(require('./${PACKAGE_DIR}/package.json').scripts?.check ? 0 : 1)"; then
-            bun run --cwd "$PACKAGE_DIR" check
-          fi
-
-      - name: Build package
-        if: steps.release.outputs.should_publish == 'true'
-        run: |
-          if node -e "process.exit(require('./${PACKAGE_DIR}/package.json').scripts?.build ? 0 : 1)"; then
-            bun run --cwd "$PACKAGE_DIR" build
-          fi
+        run: bunx turbo run check build --filter="${PACKAGE_NAME}..."
 
       - name: Publish to npm
         if: steps.release.outputs.should_publish == 'true'

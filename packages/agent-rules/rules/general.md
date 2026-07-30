@@ -84,13 +84,51 @@ Use these unless the user or repository specifies otherwise:
 - After adding a workspace dependency, run `bun install` to create the workspace link.
 - Prefer official CLIs and generators over manual scaffolding.
 
+## Monorepos and Releases
+
+- Use Bun workspaces, Turborepo, and Changesets for JavaScript and TypeScript
+  monorepos.
+- Declare every cross-workspace dependency in the consuming package with
+  `workspace:*`. Include development and build-time relationships, not only
+  runtime imports. A package's manifest should contain everything it needs to
+  build, check, and publish when considered on its own.
+- Import shared workspace tooling by package name instead of reaching into a
+  sibling directory. Give each package its own lint config and explicit config
+  dependency. Keep formatting at the monorepo root.
+- When ESLint-only rules supplement oxlint, make each code package's `lint`
+  command run both engines in parallel so standalone package checks enforce the
+  same rules as repository checks. Do not add separately exposed engine commands
+  unless there is a real workflow that invokes them individually.
+- Avoid circular workspace dependencies. When a shared config loads a plugin
+  from the same repository, give the plugin a small self-contained bootstrap
+  config rather than making the plugin depend on the config that loads it.
+- Let Turbo derive task ordering from the workspace graph. Use `^build`,
+  `^check`, and similar dependency tasks instead of hard-coded package lists,
+  `--cwd` chains, or prebuild scripts that manually build sibling packages.
+- Register repository-owned checks as Turbo root tasks such as `//#lint:root`.
+  Give those tasks `^build` when they consume workspace tooling, then invoke
+  them alongside package tasks so Turbo can schedule both from one graph.
+- Give build tasks accurate `outputs`; leave validation tasks with no outputs,
+  and disable caching for tasks that write to the working tree.
+- Use Changesets to record publishable changes and create version PRs. Couple
+  packages when one published artifact embeds or resolves another workspace's
+  exact version.
+- After `changeset version`, run `bun update` and commit `bun.lock`. Bun resolves
+  published `workspace:*` versions from the lockfile, so a manifest-only version
+  bump can publish a stale internal dependency version.
+- Publish workspace packages with `bun publish`, not `changeset publish` or
+  `npm publish`, so Bun replaces workspace protocols.
+- In CI and release jobs, use Turbo filters that include each target's dependency
+  closure. Install with `bun install --frozen-lockfile` after the version PR has
+  committed the refreshed lockfile.
+
 ## Check Pipeline
 
 Every package, whether standalone or in a workspace, should expose:
 
 - `typecheck`: `tsc --noEmit`
-- `lint`: `oxlint --type-aware`
-- `lint:fix`: `oxlint --type-aware --fix-suggestions`
+- `lint`: oxlint and ESLint in parallel
+- `lint:fix`: both lint engines' fix commands in parallel
 - `check`: `bun run typecheck && bun run lint`
 
 Standalone packages should also expose:
@@ -102,9 +140,9 @@ Monorepo roots should use Turborepo and expose:
 
 - `typecheck`: `turbo run typecheck`
 - `format`: `prettier . --write`
-- `lint`: `turbo run lint`
-- `lint:fix`: `turbo run lint:fix`
-- `check`: `turbo run check`
+- `lint`: `turbo run lint lint:root`
+- `lint:fix`: `turbo run lint:fix lint:root:fix`
+- `check`: `turbo run check check:root`
 - `fix`: `bun run typecheck && bun run lint:fix && bun run format`
 
 Keep formatting at the monorepo root so one Prettier invocation covers the repository. Use this `turbo.json` structure:
@@ -113,19 +151,42 @@ Keep formatting at the monorepo root so one Prettier invocation covers the repos
 {
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "lint": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "//#lint:root": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "lint:fix": {
+      "dependsOn": ["^build"],
       "cache": false,
       "outputs": []
     },
+    "//#lint:root:fix": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "check": {
-      "dependsOn": ["^check"],
+      "dependsOn": ["^check", "^build"],
+      "outputs": []
+    },
+    "//#check:root": {
+      "dependsOn": ["^build"],
       "outputs": []
     }
   }

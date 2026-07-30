@@ -27,8 +27,12 @@ These rules supplement the repository-wide instructions in the root `AGENTS.md`.
 
 ## Release prep
 
-- “Release” means prepare npm release for CI, not local publish, unless manual publish is explicit.
-- Run `git status`; scope release commit. Version lives in `packages/zippy/package.json` and `bun.lock`; stage only those and intentionally changed release docs.
+- “Release” means add or update the Changeset that describes the Zippy release,
+  not publish locally, unless manual publishing is explicit.
+- Run `git status`; scope the release change and select
+  `@zachsents/zippy` when running `bun changeset`.
 - Semver since latest `vX.Y.Z`: patch for fixes/docs/internal-only changes; minor for public helpers/options; major for breaking API. Pre-1.0 features still use minor.
-- Run `bun run --cwd packages/zippy check`; remove uncommitted build/pack artifacts before staging.
-- Commit `chore: release zippy X.Y.Z`; push current `main`. `.github/workflows/npm-release.yml` publishes npm/GitHub release when package version increases.
+- Run `bun run --cwd packages/zippy check` and the root packed-workspace
+  verifier; remove uncommitted build/pack artifacts before staging.
+- The version workflow updates package versions and `bun.lock` in a version PR.
+  Merging that PR publishes with `bun publish` and creates the GitHub release.

@@ -16,9 +16,13 @@
     "skills"
   ],
   "scripts": {
+    "check": "bun scripts/sync-agent-rules.ts --check",
     "prepack": "bun scripts/sync-agent-rules.ts"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "@zachsents/agent-rules": "workspace:*"
   }
 }

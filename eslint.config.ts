@@ -1,15 +1,14 @@
 import { defineConfig } from "eslint/config"
-import baseConfig from "./packages/oxlint-config/eslint.ts"
+import baseConfig from "@zachsents/oxlint-config/eslint"
 
 export default defineConfig([
   {
     ignores: [
-      "**/dist/**",
-      "**/oxlint.config.ts",
-      "eslint.config.ts",
-      "packages/eslint-plugin-zachs-rules/fixtures/**",
-      "packages/ts-mcp/test/**",
+      "packages/**",
       "plugins/**",
+      "scripts/**/*.test.ts",
+      "eslint.config.ts",
+      "oxlint.config.ts",
     ],
   },
   baseConfig,

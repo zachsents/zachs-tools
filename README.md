@@ -9,6 +9,8 @@ Personal tooling monorepo for agent type-awareness, lint rules, shared formatter
 - `packages/prettier-config`: shared Prettier config.
 - `packages/oxlint-config`: shared oxlint config objects for `oxlint.config.ts`.
 - `packages/agent-rules`: reusable `AGENTS.md` guidance for projects.
+- `packages/zippy`: typed utility functions and pipelines.
+- `plugins/zach-codex`: Codex plugin that distributes the shared rules and skills.
 
 ## Usage
 
@@ -67,11 +69,23 @@ bun install
 bun run check
 ```
 
-Bump a publishable workspace package without creating a Git commit or tag:
+Turbo derives build and check order from the `workspace:*` dependencies declared
+by each package. TypeScript packages run oxlint and ESLint concurrently from
+their own configs, while formatting runs once from the repository root.
+
+## Releasing
+
+Record every publishable change with a Changeset:
 
 ```sh
-bun run version:bump oxlint-config patch
+bun changeset
 ```
 
-The command accepts a workspace package name, directory name, or path and keeps
-the package manifest and `bun.lock` workspace version synchronized.
+After the change lands on `main`, the version workflow opens or updates a
+version PR. Its version command runs `changeset version`, synchronizes Zach Codex
+plugin metadata, and runs `bun update` so `bun.lock` contains the internal
+versions that Bun will substitute for `workspace:*`.
+
+Merging the version PR triggers the publish workflow. It checks and builds each
+package's Turbo dependency closure, publishes with `bun publish`, and creates
+the matching GitHub release.

@@ -1,1 +1,1 @@
-export { default } from "./packages/prettier-config/index.js"
+export { default } from "@zachsents/prettier-config"

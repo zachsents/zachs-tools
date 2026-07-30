@@ -26,25 +26,26 @@
   },
   "author": "Zach Sents",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "bun run src/index.ts",
     "build": "tsc -p tsconfig.build.json && shx chmod +x dist/index.js",
-    "lint": "oxlint --type-aware",
-    "lint:fix": "oxlint --type-aware --fix --fix-suggestions",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "fix": "bun run lint:fix && bun run format",
+    "lint": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware\" \"bun --bun eslint .\"",
+    "lint:fix": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware --fix --fix-suggestions\" \"bun --bun eslint . --fix\"",
     "test": "bun test/smoke.ts",
     "typecheck": "tsc --noEmit",
-    "check": "bun run --cwd ../.. build:lint-plugin && bun run format:check && bun run lint && bun run typecheck && bun run test",
+    "check": "bun run typecheck && bun run lint && bun run test",
     "prepublishOnly": "bun run check && bun run build"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@zachsents/oxlint-config": "workspace:*",
+    "concurrently": "^10.0.4",
+    "eslint": "^9.39.4",
     "oxlint": "^1.74.0",
     "oxlint-tsgolint": "^0.24.0",
-    "prettier": "3.4.2",
-    "prettier-plugin-jsdoc": "^1.8.0",
     "shx": "^0.4.0"
   },
   "dependencies": {

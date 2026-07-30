@@ -55,14 +55,12 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --type-aware --ignore-pattern 'fixtures/**'",
-    "lint:fix": "oxlint --type-aware --ignore-pattern 'fixtures/**' --fix --fix-suggestions",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
+    "lint": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware --ignore-pattern 'fixtures/**'\" \"bun --bun eslint .\"",
+    "lint:fix": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware --ignore-pattern 'fixtures/**' --fix --fix-suggestions\" \"bun --bun eslint . --fix\"",
     "test": "bun test",
     "build": "zshy",
-    "check": "bun run build && bun run format:check && bun run lint && bun run typecheck && bun run test",
-    "prepublishOnly": "bun run check"
+    "check": "bun run typecheck && bun run lint && bun run test",
+    "prepublishOnly": "bun run check && bun run build"
   },
   "files": [
     "dist",
@@ -83,15 +81,16 @@
     "@typescript-eslint/utils": "^8.62.0"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/bun": "latest",
     "@types/node": "^24.10.1",
     "@typescript-eslint/parser": "^8.62.0",
     "@typescript/native": "npm:typescript@^7.0.2",
+    "concurrently": "^10.0.4",
     "eslint": "^9.39.4",
+    "eslint-plugin-jsdoc": "^63.0.13",
     "oxlint": "^1.74.0",
     "oxlint-tsgolint": "^0.24.0",
-    "prettier": "3.4.2",
-    "prettier-plugin-jsdoc": "^1.8.0",
     "typescript": "^6.0.3",
     "zshy": "^0.7.2"
   }

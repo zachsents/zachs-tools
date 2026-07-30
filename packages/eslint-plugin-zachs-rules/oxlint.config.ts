@@ -1,8 +1,82 @@
 import { defineConfig } from "oxlint"
-import baseConfig from "../oxlint-config/index.ts"
 
+// This package cannot extend @zachsents/oxlint-config because that config loads
+// this plugin. Keep its bootstrap lint config self-contained to avoid a
+// circular workspace task graph.
 export default defineConfig({
-  extends: [baseConfig],
+  categories: {
+    correctness: "error",
+    suspicious: "error",
+  },
+  plugins: ["eslint", "typescript", "unicorn", "oxc", "jsdoc"],
+  jsPlugins: [
+    {
+      name: "jsdoc-js",
+      specifier: import.meta.resolve("eslint-plugin-jsdoc"),
+    },
+  ],
+  rules: {
+    "eslint/no-shadow": "off",
+    "eslint/no-underscore-dangle": "off",
+    "jsdoc-js/check-param-names": "error",
+    "jsdoc-js/check-tag-names": ["error", { typed: true }],
+    "jsdoc-js/no-types": "error",
+    "jsdoc-js/require-jsdoc": [
+      "error",
+      {
+        contexts: [
+          "TSDeclareFunction",
+          'MethodDefinition[value.type="TSEmptyBodyFunctionExpression"]',
+          'MethodDefinition[value.type!="TSEmptyBodyFunctionExpression"]:not(MethodDefinition[value.type="TSEmptyBodyFunctionExpression"] + MethodDefinition)',
+        ],
+        enableFixer: false,
+        exemptOverloadedImplementations: true,
+        require: {
+          ClassDeclaration: true,
+          FunctionDeclaration: true,
+          MethodDefinition: false,
+        },
+        skipInterveningOverloadedDeclarations: false,
+      },
+    ],
+    "jsdoc-js/require-param": ["error", { enableFixer: false }],
+    "jsdoc-js/require-param-description": "error",
+    "jsdoc-js/require-returns": "off",
+    "jsdoc-js/require-returns-description": "off",
+    "jsdoc-js/require-throws": "error",
+    "jsdoc-js/require-throws-description": "error",
+    "jsdoc-js/require-yields": "error",
+    "jsdoc-js/require-yields-description": "error",
+    "typescript/consistent-return": "off",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-empty-object-type": [
+      "error",
+      { allowInterfaces: "with-single-extends" },
+    ],
+    "typescript/no-restricted-types": "error",
+    "typescript/no-inferrable-types": "error",
+    "typescript/no-unnecessary-boolean-literal-compare": "error",
+    "typescript/no-unnecessary-condition": [
+      "error",
+      { allowConstantLoopConditions: "only-allowed-literals" },
+    ],
+    "typescript/no-unnecessary-parameter-property-assignment": "error",
+    "typescript/no-unnecessary-qualifier": "error",
+    "typescript/no-unnecessary-template-expression": "error",
+    "typescript/no-unnecessary-type-arguments": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unnecessary-type-constraint": "error",
+    "typescript/no-unnecessary-type-parameters": "error",
+    "typescript/prefer-find": "error",
+    "typescript/prefer-for-of": "error",
+    "typescript/prefer-includes": "error",
+    "typescript/prefer-optional-chain": "error",
+    "typescript/prefer-promise-reject-errors": "error",
+    "typescript/prefer-reduce-type-parameter": "error",
+    "typescript/prefer-return-this-type": "error",
+    "typescript/prefer-string-starts-ends-with": "error",
+    "typescript/prefer-ts-expect-error": "error",
+  },
   overrides: [
     {
       files: ["fixtures/**", "test/**"],
