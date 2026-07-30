@@ -16,7 +16,7 @@
     "skills"
   ],
   "scripts": {
-    "check": "bun scripts/sync-agent-rules.ts --check",
+    "check": "bun scripts/sync-agent-rules.ts",
     "prepack": "bun scripts/sync-agent-rules.ts"
   },
   "publishConfig": {

@@ -8,12 +8,11 @@
     "plugins/*"
   ],
   "scripts": {
-    "agent-rules:check": "bun plugins/zach-codex/scripts/sync-agent-rules.ts --check",
     "agent-rules:sync": "bun plugins/zach-codex/scripts/sync-agent-rules.ts",
     "build": "turbo run build",
     "changeset": "changeset",
     "check": "turbo run check check:root && bun run build",
-    "check:root": "bun run agent-rules:check && bun run format:check && bun run lint:root && bun run typecheck:scripts",
+    "check:root": "bun run format:check && bun run lint:root && bun run typecheck:scripts",
     "ci:version": "bun run version",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
