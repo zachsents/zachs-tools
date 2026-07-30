@@ -25,7 +25,7 @@
     "test": "turbo run test",
     "typecheck": "bun run typecheck:scripts && turbo run typecheck",
     "typecheck:scripts": "tsc --noEmit -p scripts/tsconfig.json",
-    "version": "changeset version && bun run plugin:sync-version && bun update"
+    "version": "changeset version && bun run plugin:sync-version && bun update && bun run format"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.1",

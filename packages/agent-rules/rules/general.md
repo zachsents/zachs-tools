@@ -116,6 +116,8 @@ Use these unless the user or repository specifies otherwise:
 - After `changeset version`, run `bun update` and commit `bun.lock`. Bun resolves
   published `workspace:*` versions from the lockfile, so a manifest-only version
   bump can publish a stale internal dependency version.
+- Run the repository formatter after versioning so generated manifests and
+  changelogs satisfy the same formatting checks as hand-authored files.
 - Publish workspace packages with `bun publish`, not `changeset publish` or
   `npm publish`, so Bun replaces workspace protocols.
 - In CI and release jobs, use Turbo filters that include each target's dependency
