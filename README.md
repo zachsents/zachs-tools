@@ -25,6 +25,9 @@ Use `$update-zachs-tools` in a consumer repository to update its installed
 zachs-tools packages, refresh the global Zach Codex plugin, review published
 package diffs, and migrate configs or agent guidance affected by the releases.
 
+Use `$handoff` to produce a terse, copyable context handoff for continuing work
+in a fresh task or with another agent.
+
 Add this line to a project's root `AGENTS.md`:
 
 ```md

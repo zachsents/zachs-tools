@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Create terse, copyable context handoffs"
+  default_prompt: "Use $handoff to give me a terse handoff for a fresh task."
