@@ -20,8 +20,23 @@
 
 - Keep components small; move non-UI logic into hooks.
 - One component or hook per file unless trivial.
+- Give component props a named interface.
 - Avoid `useEffect` whenever possible; prefer event-driven architecture.
 - Always strictly follow the Rules of React.
+- For a small static list whose items have distinct markup, write the items
+  directly or extract a shared component. Do not force them through a data array
+  that needs identity checks or one-off JSX values.
+
+## UI Primitives
+
+- Use shadcn components for standard UI primitives. Add a missing primitive with
+  the shadcn CLI instead of hand-rolling an equivalent.
+- Treat shadcn-generated classes as design-system defaults. Do not flag,
+  restate, or override them from consumers unless the exception is intentional.
+- Let design-system components such as buttons, menus, and badges size their
+  icons. Do not add consumer-level icon sizing without an intentional exception.
+- Do not add transitions, custom leading or tracking, or breakpoint-specific
+  font-size changes unless the user requests them.
 
 ## JSDoc
 

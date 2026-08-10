@@ -2,9 +2,10 @@
 
 Reusable coding guidance for agents.
 
-`rules/general.md` is the main rulebook. Framework-specific guidance stays separate:
+`rules/general.md` is the main rulebook. Conditional guidance stays separate:
 
 - `rules/general.md`
+- `rules/dev-stacks.md`
 - `rules/react.md`
 - `rules/tanstack.md`
 - `rules/convex.md`
