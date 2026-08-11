@@ -20,6 +20,7 @@ export {
   type Truthy,
 } from "./guards"
 export { identity } from "./identity"
+export { lazy } from "./lazy"
 export {
   map,
   mapAsync,

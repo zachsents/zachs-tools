@@ -90,6 +90,8 @@ callback or a type-safe property/dot path on the base helper name, such as
 ### Other
 
 - `identity` - Return the input value unchanged. Like `(value) => value`.
+- `lazy` - Return a getter that loads its value on first access and caches the
+  result.
 - `resolveFactory` - Return a value unchanged or invoke a zero-argument factory
   to get its value.
 - `tuple` - Return arguments as a tuple. Like `(...values) => values`.
