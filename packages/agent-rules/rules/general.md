@@ -3,7 +3,9 @@
 ## Workflow
 
 - Use Bun as the package manager and runtime, including scripts and CLIs such as `bunx shadcn@latest add menu`.
-- Research current documentation before using a library; do not rely on remembered APIs.
+- Before using TanStack or another established third-party library, consult its
+  current official documentation and follow its documented idiomatic patterns;
+  do not rely on remembered APIs or invent a custom approach without checking.
 - Inspect the repository's existing patterns before implementing a new one.
 - If the project has an oxlint config, run `oxlint --rules` before writing code and follow the active rules.
 - Never start a dev server unless the user asks or repository-specific guidance
@@ -98,6 +100,11 @@ Use these unless the user or repository specifies otherwise:
 - Avoid casts unless required. Never use `as unknown as`.
 - Import or derive existing types instead of redefining them.
 - Validate untrusted values with Zod and infer their types from the schema.
+- Do not add runtime checks for invariants that TypeScript already guarantees in
+  trusted typed code. Keep runtime validation at genuine trust boundaries such
+  as client input, network responses, files, environment variables, and
+  persisted data, especially when malformed data could affect security or data
+  integrity.
 - Never edit generated files. Change their source definition and run the owning
   generator.
 - Do not create `.d.ts` files to declare modules.
