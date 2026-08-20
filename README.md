@@ -87,8 +87,10 @@ bun changeset
 After the change lands on `main`, the version workflow opens or updates a
 version PR. Its version command runs `changeset version`, synchronizes Zach Codex
 plugin metadata, and runs `bun update` so `bun.lock` contains the internal
-versions that Bun will substitute for `workspace:*`.
+versions that Bun will substitute for `workspace:*`. The workflow enables
+squash auto-merge, so the version PR merges as soon as the required `Check` job
+passes without requiring a review or manual merge.
 
-Merging the version PR triggers the publish workflow. It checks and builds each
+The merged version PR triggers the publish workflow. It checks and builds each
 package's Turbo dependency closure, publishes with `bun publish`, and creates
 the matching GitHub release.

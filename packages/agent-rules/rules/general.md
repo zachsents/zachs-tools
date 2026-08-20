@@ -196,9 +196,17 @@ Use these unless the user or repository specifies otherwise:
   them alongside package tasks so Turbo can schedule both from one graph.
 - Give build tasks accurate `outputs`; leave validation tasks with no outputs,
   and disable caching for tasks that write to the working tree.
-- Use Changesets to record publishable changes and create version PRs. Couple
-  packages when one published artifact embeds or resolves another workspace's
-  exact version.
+- Use Changesets to record publishable changes and create version PRs. Make
+  version PRs hands-off: create them with a dedicated GitHub App token, enable
+  auto-merge after the Changesets action creates or updates the PR, and protect
+  the default branch so the PR merges only after required CI checks pass. Give
+  the App read/write access to contents and pull requests, store its client ID
+  as `CHANGESETS_APP_CLIENT_ID` and private key as
+  `CHANGESETS_APP_PRIVATE_KEY`, and use the minted token for checkout, the
+  Changesets action, and `gh pr merge --auto --squash`. Do not use the default
+  `GITHUB_TOKEN` for this flow because bot-authored events may not trigger the
+  required PR workflows. Couple packages when one published artifact embeds or
+  resolves another workspace's exact version.
 - After `changeset version`, run `bun update` and commit `bun.lock`. Bun resolves
   published `workspace:*` versions from the lockfile, so a manifest-only version
   bump can publish a stale internal dependency version.
