@@ -1,4 +1,4 @@
 interface:
   display_name: "Review Code"
-  short_description: "Review code for subtle maintainability issues"
-  default_prompt: "Use $review-code to review these changes for non-linter rule violations and unnecessary complexity."
+  short_description: "Review code for correctness and contract gaps"
+  default_prompt: "Use $review-code to review the complete change for correctness, contract completeness, runtime failure modes, and non-linter rule violations."
