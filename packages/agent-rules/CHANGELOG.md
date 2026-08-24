@@ -1,5 +1,12 @@
 # @zachsents/agent-rules
 
+## 0.2.1
+
+### Patch Changes
+
+- c2f8c8a: Make hands-off Changesets version PRs the default release guidance by using a
+  dedicated GitHub App token, required CI checks, and squash auto-merge.
+
 ## 0.2.0
 
 ### Minor Changes
