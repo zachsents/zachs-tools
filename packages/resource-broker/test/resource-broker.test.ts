@@ -479,7 +479,7 @@ function spawnBroker(
       "--",
       ...command,
     ],
-    env: { ...process.env, ...environment },
+    env: { ...process.env, CI: "false", ...environment },
     stdio: ["ignore", "ignore", "pipe"],
   })
 }
