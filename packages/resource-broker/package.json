@@ -1,6 +1,6 @@
 {
   "name": "@zachsents/resource-broker",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Coordinate resource-intensive local agent commands across processes and worktrees.",
   "type": "module",
   "main": "dist/index.js",
