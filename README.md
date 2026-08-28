@@ -5,6 +5,7 @@ Personal tooling monorepo for agent type-awareness, lint rules, shared formatter
 ## Packages
 
 - `packages/ts-mcp`: MCP server that gives agents TypeScript language-server awareness.
+- `packages/resource-broker`: machine-wide admission and memory-pressure protection for agent-run commands.
 - `packages/eslint-plugin-zachs-rules`: custom ESLint and oxlint rules.
 - `packages/prettier-config`: shared Prettier config.
 - `packages/oxlint-config`: shared oxlint config objects for `oxlint.config.ts`.

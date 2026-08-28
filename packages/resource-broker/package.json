@@ -1,0 +1,57 @@
+{
+  "name": "@zachsents/resource-broker",
+  "version": "0.0.0",
+  "description": "Coordinate resource-intensive local agent commands across processes and worktrees.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "resource-broker": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "agent",
+    "cli",
+    "concurrency",
+    "memory-pressure",
+    "resource-broker"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zachsents/zachs-tools.git",
+    "directory": "packages/resource-broker"
+  },
+  "author": "Zach Sents",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && shx chmod +x dist/cli.js",
+    "lint": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware\" \"bun --bun eslint .\"",
+    "lint:fix": "concurrently --success all --kill-others-on-fail \"oxlint --type-aware --fix --fix-suggestions\" \"bun --bun eslint . --fix\"",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun run lint && bun run test",
+    "prepublishOnly": "bun run check && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@zachsents/oxlint-config": "workspace:*",
+    "concurrently": "^10.0.5",
+    "eslint": "^9.39.5",
+    "oxlint": "^1.80.0",
+    "oxlint-tsgolint": "^0.24.0",
+    "shx": "^0.4.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -13,7 +13,7 @@
         "concurrently": "^10.0.5",
         "eslint": "^9.39.5",
         "jiti": "^2.7.0",
-        "oxlint": "^1.79.0",
+        "oxlint": "^1.80.0",
         "oxlint-tsgolint": "^0.24.0",
         "prettier": "3.4.2",
         "turbo": "^2.10.11",
@@ -85,6 +85,23 @@
       },
       "peerDependencies": {
         "prettier": ">=3",
+      },
+    },
+    "packages/resource-broker": {
+      "name": "@zachsents/resource-broker",
+      "version": "0.1.0",
+      "bin": {
+        "resource-broker": "dist/cli.js",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@zachsents/oxlint-config": "workspace:*",
+        "concurrently": "^10.0.5",
+        "eslint": "^9.39.5",
+        "oxlint": "^1.80.0",
+        "oxlint-tsgolint": "^0.24.0",
+        "shx": "^0.4.0",
+        "typescript": "^6.0.3",
       },
     },
     "packages/ts-mcp": {
@@ -408,6 +425,8 @@
     "@zachsents/oxlint-config": ["@zachsents/oxlint-config@workspace:packages/oxlint-config"],
 
     "@zachsents/prettier-config": ["@zachsents/prettier-config@workspace:packages/prettier-config"],
+
+    "@zachsents/resource-broker": ["@zachsents/resource-broker@workspace:packages/resource-broker"],
 
     "@zachsents/ts-mcp": ["@zachsents/ts-mcp@workspace:packages/ts-mcp"],
 
