@@ -65,6 +65,28 @@ jobs:
             echo "should_create_release=${should_create_release}" >> "$GITHUB_OUTPUT"
           }
 
+          registry_version() {
+            local requested_version="$1"
+            local field="$2"
+            local encoded_name
+            local document
+
+            encoded_name="$(node -p 'encodeURIComponent(process.argv[1])' "$package_name")"
+            document="$(curl --fail --silent --show-error "https://registry.npmjs.org/${encoded_name}?cachebust=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s%N)" 2>/dev/null || true)"
+            if [ -z "$document" ]; then
+              return 0
+            fi
+
+            printf '%s' "$document" | node -e '
+              const document = JSON.parse(require("fs").readFileSync(0, "utf8"));
+              const [version, field] = process.argv.slice(1);
+              const value = field === "latest"
+                ? document["dist-tags"]?.latest
+                : document.versions?.[version]?.version;
+              if (value) process.stdout.write(value);
+            ' "$requested_version" "$field"
+          }
+
           package_json="${PACKAGE_DIR}/package.json"
           package_name="$(node -p "require('./${package_json}').name")"
           package_version="$(node -p "require('./${package_json}').version")"
@@ -136,7 +158,7 @@ jobs:
             exit 0
           fi
 
-          published_version="$(npm view "${package_name}@${package_version}" version --prefer-online 2>/dev/null || true)"
+          published_version="$(registry_version "$package_version" version)"
           release_exists=false
 
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
@@ -191,9 +213,31 @@ jobs:
       - name: Verify npm release
         if: steps.release.outputs.should_publish == 'true'
         run: |
+          registry_version() {
+            local requested_version="$1"
+            local field="$2"
+            local encoded_name
+            local document
+
+            encoded_name="$(node -p 'encodeURIComponent(process.argv[1])' "$PACKAGE_NAME")"
+            document="$(curl --fail --silent --show-error "https://registry.npmjs.org/${encoded_name}?cachebust=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(date +%s%N)" 2>/dev/null || true)"
+            if [ -z "$document" ]; then
+              return 0
+            fi
+
+            printf '%s' "$document" | node -e '
+              const document = JSON.parse(require("fs").readFileSync(0, "utf8"));
+              const [version, field] = process.argv.slice(1);
+              const value = field === "latest"
+                ? document["dist-tags"]?.latest
+                : document.versions?.[version]?.version;
+              if (value) process.stdout.write(value);
+            ' "$requested_version" "$field"
+          }
+
           for attempt in 1 2 3 4 5 6; do
-            published_version="$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --prefer-online 2>/dev/null || true)"
-            latest_version="$(npm view "${PACKAGE_NAME}" dist-tags.latest --prefer-online 2>/dev/null || true)"
+            published_version="$(registry_version "$PACKAGE_VERSION" version)"
+            latest_version="$(registry_version "$PACKAGE_VERSION" latest)"
 
             if [ "$published_version" = "$PACKAGE_VERSION" ] && [ "$latest_version" = "$PACKAGE_VERSION" ]; then
               exit 0
