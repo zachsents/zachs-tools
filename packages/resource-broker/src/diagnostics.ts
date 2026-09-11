@@ -61,6 +61,8 @@ function formatEvent(event: BrokerEvent): string | undefined {
       return `terminated orphaned process group ${event.processGroupId ?? "unknown"}`
     case "memory-pressure.normal":
       return "memory pressure returned to normal"
+    case "memory-pressure.warning":
+      return "memory pressure warning; keeping active jobs running"
     default:
       return undefined
   }
