@@ -244,7 +244,37 @@ describe("resource-broker", () => {
     )
   })
 
-  test("memory pressure terminates the newest process group with the resource exit status", async () => {
+  test("warning pressure keeps jobs running within the shared admission limit", async () => {
+    const directory = createTemporaryDirectory()
+    const pressureFile = join(directory, "pressure")
+    const counterDatabase = join(directory, "counter.sqlite")
+    await Bun.write(pressureFile, "2")
+    initializeCounter(counterDatabase)
+    const jobs = [1, 2, 3].map(() =>
+      spawnBroker(
+        directory,
+        "warning-pressure-test",
+        2,
+        1,
+        [process.execPath, COUNTER_FIXTURE_PATH, counterDatabase, "200"],
+        {
+          RESOURCE_BROKER_TEST_PRESSURE_FILE: pressureFile,
+          RESOURCE_BROKER_PRESSURE_POLL_INTERVAL_MS: "25",
+        },
+      ),
+    )
+
+    expect(await Promise.all(jobs.map((job) => job.exited))).toEqual([0, 0, 0])
+    expect(readMaximum(counterDatabase)).toBe(2)
+    using state = new BrokerState(directory)
+    expect(
+      state
+        .listEvents(undefined, 100)
+        .filter(({ event }) => event === "memory-pressure.warning"),
+    ).toHaveLength(1)
+  })
+
+  test("critical memory pressure terminates the newest process group with the resource exit status", async () => {
     const directory = createTemporaryDirectory()
     const pressureFile = join(directory, "pressure")
     await Bun.write(pressureFile, "1")

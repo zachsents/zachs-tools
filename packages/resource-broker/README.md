@@ -30,7 +30,7 @@ When `CI=true`, the CLI runs the command directly without creating local broker 
 
 ## Memory pressure
 
-On macOS, every owner monitors `kern.memorystatus_vm_pressure_level`. Warning or critical pressure atomically selects the newest active job across all pools, sends its process group `SIGTERM`, and escalates to `SIGKILL` after three seconds. Continued pressure can cancel another newest job after a five-second cooldown.
+On macOS, every owner monitors `kern.memorystatus_vm_pressure_level`. Warning pressure records a diagnostic and keeps jobs running; normal pool limits still apply. Critical pressure atomically selects the newest active job across all pools, sends its process group `SIGTERM`, and escalates to `SIGKILL` after three seconds. Continued critical pressure can cancel another newest job after a five-second cooldown. Warning and recovery diagnostics are emitted once per transition across monitors.
 
 A job cancelled for resource pressure exits with status **75** (`RESOURCE_CANCELLATION_EXIT_CODE`) regardless of the signal observed by its child. Status 75 is reserved: an ordinary child status 75 is remapped to 76 and preserved as `childExitCode` in diagnostics. Callers can therefore distinguish retryable resource cancellation from command failure.
 

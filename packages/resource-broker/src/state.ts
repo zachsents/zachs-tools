@@ -840,11 +840,11 @@ export class BrokerState implements Disposable {
   /**
    * Atomically select and cancel the newest job during macOS memory pressure.
    *
-   * @param level - Warning or critical pressure level.
+   * @param level - Critical pressure level.
    * @param cooldownMs - Minimum delay between cancellations.
    */
   requestPressureCancellation(
-    level: Exclude<MemoryPressureLevel, "normal">,
+    level: "critical",
     cooldownMs: number,
   ): CancellationTarget | undefined {
     const cancel = this.#database.transaction(() => {
@@ -896,10 +896,14 @@ export class BrokerState implements Disposable {
     return target
   }
 
-  /** Record normal pressure and report whether the system has just recovered. */
-  observeNormalPressure(): boolean {
+  /**
+   * Record non-critical pressure and report transitions once across monitors.
+   *
+   * @param level - Current normal or warning pressure level.
+   */
+  observePressure(level: Exclude<MemoryPressureLevel, "critical">): boolean {
     const observe = this.#database.transaction(() => {
-      // Preserve the pre-update level so only one monitor reports recovery.
+      // Preserve the pre-update level so only one monitor reports a transition.
       const previousLevel = this.#database
         .query<
           PressureRow,
@@ -907,10 +911,10 @@ export class BrokerState implements Disposable {
         >("SELECT level, last_cancelled_at FROM pressure WHERE singleton = 1")
         .get()?.level
       this.#database.run(
-        "UPDATE pressure SET level = 'normal', last_observed_at = ? WHERE singleton = 1",
-        [Date.now()],
+        "UPDATE pressure SET level = ?, last_observed_at = ? WHERE singleton = 1",
+        [level, Date.now()],
       )
-      return previousLevel !== "normal"
+      return previousLevel !== level
     })
     return observe.immediate()
   }

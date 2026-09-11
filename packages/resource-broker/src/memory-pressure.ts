@@ -20,8 +20,7 @@ interface MemoryPressureMonitorOptions {
 }
 
 /**
- * Poll macOS pressure state and cancel the newest admitted job when pressure
- * rises.
+ * Report macOS pressure transitions and cancel work only at critical pressure.
  *
  * @param options - Monitor state and diagnostic settings.
  */
@@ -40,11 +39,11 @@ export function startMemoryPressureMonitor(
     checking = true
     try {
       const level = readMemoryPressureLevel()
-      if (level === "normal") {
-        if (options.state.observeNormalPressure()) {
+      if (level !== "critical") {
+        if (options.state.observePressure(level)) {
           emitDiagnostic(
             options.diagnostics,
-            options.state.recordEvent("memory-pressure.normal", undefined, {
+            options.state.recordEvent(`memory-pressure.${level}`, undefined, {
               level,
             }),
           )
