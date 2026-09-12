@@ -13,7 +13,8 @@
 - Use `ref` as a regular prop. `forwardRef` is no longer needed in React 19.
 - Ref callbacks can return a cleanup function. Prefer inline ref callbacks for per-element observers such as `ResizeObserver` or `IntersectionObserver`.
 - When using `useEffect` to subscribe to events, use `useEffectEvent` for the handler. The effect should only manage subscription and cleanup.
-- Prefer the `use()` hook for reading promises and context in render.
+- Prefer the `use()` hook for reading context in render. Use React Query for
+  async data.
 - Use error boundaries to isolate failures in distinct UI sections.
 
 ## Components & Hooks
@@ -26,6 +27,19 @@
 - For a small static list whose items have distinct markup, write the items
   directly or extract a shared component. Do not force them through a data array
   that needs identity checks or one-off JSX values.
+
+## Async State
+
+- Always use TanStack React Query for async operations: queries for reads and
+  mutations for writes or imperative async actions.
+- Manual loading, pending, and error state management is strictly prohibited.
+  Do not track async lifecycle state with `useState`, `useReducer`, refs, stores,
+  or custom async wrappers, including `setLoading` / `setError` patterns around
+  `try/catch/finally`.
+- Derive loading indicators, disabled controls, and error messages directly from
+  React Query's query or mutation state. Never mirror that state locally.
+- Do not fetch data in effects or hand-roll request lifecycle management. Keep
+  synchronous UI state local when appropriate.
 
 ## UI Primitives
 
