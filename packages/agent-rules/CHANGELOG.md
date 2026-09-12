@@ -1,5 +1,12 @@
 # @zachsents/agent-rules
 
+## 0.2.2
+
+### Patch Changes
+
+- 82ac5a5: Require React Query for async operations in React and strictly prohibit manual
+  loading, pending, and error state management.
+
 ## 0.2.1
 
 ### Patch Changes
